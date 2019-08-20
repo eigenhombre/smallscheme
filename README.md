@@ -16,5 +16,5 @@ Done
 To Do
 -----
 1. Parsing of same
-1v. Eval of same
+1. Eval of same
 
