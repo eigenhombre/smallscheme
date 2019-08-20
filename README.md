@@ -9,9 +9,12 @@ Setup
 
 `pip install -r requirements.txt`
 
-Todos
+Done
+----
+1. Lexing of atoms and s-expressions
+
+To Do
 -----
-1. ~~Lexing of atoms and s-expressions~~
-2. Parsing of same
-3. Eval of same
+1. Parsing of same
+1v. Eval of same
 
