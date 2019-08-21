@@ -45,17 +45,27 @@ def evalu(ast):
         return ast
     if 'atom' in ast and ast['atom'] == "+":
         return {"intproc": "+"}
+    if 'list' in ast:
+        if not ast['list']:
+            return {'list': []}
+        elif ast['list'][0] == {'atom': 'quote'}:
+            return ast['list'][1]
     raise Exception('evaluation error: "%s"' % ast)
 
 def printable_value(ast):
     if 'num' in ast:
-        return ast['num']
+        return str(ast['num'])
     if 'bool' in ast:
         return {True: "#t",
                 False: "#f"}.get(ast['bool'])
     if 'intproc' in ast:
         return "Internal procedure '%s'" % ast['intproc']
-    return ast
+    if 'atom' in ast:
+        return ast['atom']
+    if 'list' in ast:
+        return '(' + ' '.join([printable_value(x)
+                               for x in ast['list']]) + ')'
+    raise Exception('Unprintable ast "%s"' % ast)
 
 def repl():
     while True:
@@ -66,9 +76,9 @@ def repl():
             break
         if x:
             parsed = parse_str(x)
-            print(parsed)
+            # print(parsed)
             evaluated = evalu(parsed)
-            print(evaluated)
+            # print(evaluated)
             output = printable_value(evaluated)
             print(output)
 
