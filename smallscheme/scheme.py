@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 import re
+import operator
+from functools import reduce
 
 def remove_nil_keys(m):
-    return dict((k, v) for k, v in m.items()
-                if v is not None)
+    for k, v in m.items():
+        if v is not None:
+            return k, v
 
-pat = ("^\s*\((?P<list>.*)\)$"
+pat = ("(?ms)^\s*\((?P<list>.*)\)$"
        "|"
        "(?P<bool>(\#t|\#f))\s*"
        "|"
@@ -14,57 +17,82 @@ pat = ("^\s*\((?P<list>.*)\)$"
        "|"
        "(?P<num>[0-9]+)\s*")
 
-def parse_list_body(a):
+def parse_list_body(body_str):
     ret = []
-    while True:
-        m, remaining = reduce1(a)
+    while body_str:
+        m, remaining = reduce1(body_str)
         ret.append(m)
         if not remaining:
             break
-        a = remaining
+        body_str = remaining
     return ret
 
 def reduce1(x):
     match = re.search(pat, x)
     assert match, "Invalid input '%s'!" % x
-    m =  remove_nil_keys(re.search(pat, x).groupdict())
-    if m.get("num"):
-        m["num"] = int(m["num"])
-    if m.get("bool"):
-        m["bool"] = True if m["bool"] == "#t" else False
-    elif m.get("list"):
-        m["list"] = parse_list_body(m["list"])
+    k, v = remove_nil_keys(re.search(pat, x).groupdict())
+    if k == 'num':
+        v = int(v)
+    if k == 'bool':
+        v = True if v == "#t" else False
+    if k == 'list':
+        v = parse_list_body(v)
     remaining = x[match.end():]
-    return m, remaining
+    return (k, v), remaining
 
 def parse_str(x):
     return reduce1(x)[0]
 
+def plus(args):
+    return ('num', sum(x for (_, x) in args))
+
+def times(args):
+    return ('num', reduce(operator.mul,
+                          (x for (_, x) in args),
+                          1))
+
+def minus(args):
+    return ('num', args[0][1] - sum(x for (_, x) in args[1:]))
+
+def dispatch(fn_name, args):
+    fn = {'+': plus,
+          '*': times,
+          '-': minus}.get(fn_name, None)
+    if fn is None:
+        raise Exception('Unknown function name: "%s"'
+                        % fn_name)
+    return fn(args)
+
 def evalu(ast):
-    if 'num' in ast or 'bool' in ast:
+    k, v = ast
+    if k == 'num' or k == 'bool':
         return ast
-    if 'atom' in ast and ast['atom'] == "+":
-        return {"intproc": "+"}
-    if 'list' in ast:
-        if not ast['list']:
-            return {'list': []}
-        elif ast['list'][0] == {'atom': 'quote'}:
-            return ast['list'][1]
-    raise Exception('evaluation error: "%s"' % ast)
+    if k == 'atom' and v == '+':
+        return ('intproc', '+')
+    if k == 'list':
+        if not v:
+            return ('list', [])
+        elif v[0] == ('atom', 'quote'):
+            return v[1]
+        else:
+            (_, fn_name) = v[0]
+            return dispatch(fn_name, [evalu(x) for x in v[1:]])
+    raise Exception('evaluation error: "%s"' % str(ast))
 
 def printable_value(ast):
-    if 'num' in ast:
-        return str(ast['num'])
-    if 'bool' in ast:
+    k, v = ast
+    if k == 'num':
+        return str(v)
+    if k == 'bool':
         return {True: "#t",
-                False: "#f"}.get(ast['bool'])
-    if 'intproc' in ast:
-        return "Internal procedure '%s'" % ast['intproc']
-    if 'atom' in ast:
-        return ast['atom']
-    if 'list' in ast:
+                False: "#f"}.get(v)
+    if k == 'intproc':
+        return "Internal procedure '%s'" % v
+    if k == 'atom':
+        return v
+    if k == 'list':
         return '(' + ' '.join([printable_value(x)
-                               for x in ast['list']]) + ')'
+                                for x in v]) + ')'
     raise Exception('Unprintable ast "%s"' % ast)
 
 def repl():
@@ -75,12 +103,7 @@ def repl():
             print()
             break
         if x:
-            parsed = parse_str(x)
-            # print(parsed)
-            evaluated = evalu(parsed)
-            # print(evaluated)
-            output = printable_value(evaluated)
-            print(output)
+            print(printable_value(evalu(parse_str(x))))
 
 if __name__ == "__main__":
     repl()
