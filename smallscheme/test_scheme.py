@@ -1,80 +1,56 @@
 #!/usr/bin/env python
 
 import re
-import ply.lex as lex
 
-tokens = (
-    'NUMBER',
-    'ATOM',
-    'LPAREN',
-    'RPAREN',
-    'BOOL'
-    )
+def remove_nil_keys(m):
+    return dict((k, v) for k, v in m.items() if v is not None)
 
-t_LPAREN  = r'\('
-t_RPAREN  = r'\)'
-t_ignore  = ' \t'
+pat = ("^\s*\((?P<list>.*)\)$"
+       "|"
+       "(?P<atom>[a-zA-Z\+\-\*\/]+[a-zA-Z0-9\+\-\*\/]*)\s*"
+       "|"
+       "(?P<num>[0-9]+)\s*")
 
-def t_error(t):
-     print("Illegal character '%s'" % t.value[0])
-     t.lexer.skip(1)
+def parse_list_body(a):
+    ret = []
+    while True:
+        m, remaining = reduce1(a)
+        ret.append(m)
+        if not remaining:
+            break
+        a = remaining
+    return ret
 
-def t_NUMBER(t):
-     r'\d+'
-     t.value = int(t.value)
-     return t
+def reduce1(x):
+    match = re.search(pat, x)
+    assert match, "Invalid input '%s'!" % x
+    m =  remove_nil_keys(re.search(pat, x).groupdict())
+    if m.get("num"):
+        m["num"] = int(m["num"])
+    elif m.get("list"):
+        m["list"] = parse_list_body(m["list"])
+    remaining = x[match.end():]
+    return m, remaining
 
-def t_ATOM(t):
-    r'[a-zA-Z]+[a-zA-Z0-9]*|\+'
-    return t
+def read_str(x):
+    return reduce1(x)[0]
 
-def t_BOOL(t):
-    r'\#t|\#f'
-    if t.value == '#t':
-        t.value = True
-    elif t.value == '#f':
-        t.value = False
-    else:
-        raise Exception("bad bool!")
-    return t
-
-lexer = lex.lex()
-
-def lexie(s):
-    lexer.input(s)
-    return [tok for tok in lexer]
-
-def first(l):
-    return l[0]
-
-def atuple(s):
-    fl = first(lexie(s))
-    return fl.type, fl.value
-
-def test_bools():
-    assert atuple('#t')==('BOOL', True)
-    assert atuple('#f')==('BOOL', False)
-
-def test_atoms():
-    assert atuple('123')==('NUMBER', 123)
-    assert atuple('0')==('NUMBER', 0)
-    assert atuple('QUOTE')==('ATOM', 'QUOTE')
-    assert atuple('quote')==('ATOM', 'quote')
-    assert atuple('a')==('ATOM', 'a')
-    assert atuple('+')==('ATOM', '+')
-
-def test_lex_sexpr():
-    assert ([(tok.type, tok.value) for tok in lexie("(+ 1 1)")]
+def test_read_str():
+    assert (read_str("x") == {'atom': 'x'})
+    assert (read_str("y") == {'atom': 'y'})
+    assert (read_str("yxyz") == {'atom': 'yxyz'})
+    assert (read_str("1234") == {'num': 1234})
+    assert (read_str("(a)") == {'list': [{'atom': 'a'}]})
+    assert (read_str("(a 1 1)")
             ==
-            [('LPAREN', '('),
-             ('ATOM', '+'),
-             ('NUMBER', 1),
-             ('NUMBER', 1),
-             ('RPAREN', ')')])
-    assert ([(tok.type, tok.value) for tok in lexie("(quote z)")]
+            {'list': [{'atom': 'a'}, {'num': 1}, {'num': 1}]})
+    assert (read_str("(+ 2 3)")
             ==
-            [('LPAREN', '('),
-             ('ATOM', 'quote'),
-             ('ATOM', 'z'),
-             ('RPAREN', ')')])
-
+            {'list': [{'atom': '+'}, {'num': 2}, {'num': 3}]})
+    assert (read_str("(a 1 (b foo x3))")
+            ==
+            {'list': [{'atom': 'a'},
+                      {'num': 1},
+                      {'list': [{'atom': 'b'},
+                                {'atom': 'foo'},
+                                {'atom': 'x3'}]}]})
