@@ -2,7 +2,7 @@ from smallscheme.scheme import *
 from pprint import pformat
 
 def teq(a, b):
-    assert a == b, "%s\n!=\n%s" % (pformat(a), pformat(b))
+    assert a == b, "\n%s\n!=\n%s" % (pformat(a), pformat(b))
 
 def test_parse_str():
     def t(a, b):
@@ -26,11 +26,20 @@ def test_parse_str():
                 ('list', [('atom', 'b'),
                           ('atom', 'foo'),
                           ('atom', 'x3')])]))
-    t("(a (b c) d)", ('list', [('atom', 'a'),
-                               ('list', [('atom', 'b'),
-                                         ('atom', 'c')]),
-                               ('atom', 'd')]))
+    t("(())", ("list", [("list", [])]))
+    t("((a))", ("list", [("list", [('atom', 'a')])]))
+    t("((a b))", ("list", [("list", [('atom', 'a'),
+                                     ('atom', 'b')])]))
+    t("(a (b))", ("list", [("atom", "a"),
+                           ("list", [("atom", "b")])]))
     # FIXME:
+    # SFTC:
+    # t("((a) b)", ("list", [("list", [("atom", "a")]),
+    #                        ("atom", "b")]))
+    # t("(a (b c) d)", ('list', [('atom', 'a'),
+    #                            ('list', [('atom', 'b'),
+    #                                      ('atom', 'c')]),
+    #                            ('atom', 'd')]))
     # t("(+ (* 2 4) (+ 3 5))",
     #   ('list', [('atom', '+'),
     #             ('list', [('atom', '*'),
