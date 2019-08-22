@@ -7,7 +7,8 @@ def teq(a, b):
 def test_parse_str():
     def t(a, b):
         teq(parse_str(a), b)
-    t("1234", ('num', 1234))
+    t("1234", ('int', 1234))
+    t("3.1415", ('float', 3.1415))
     t("x", ('atom', 'x'))
     t("y", ('atom', 'y'))
     t("yxyz", ('atom', 'yxyz'))
@@ -15,14 +16,14 @@ def test_parse_str():
     t("#f", ("bool", False))
     t("(a)", ('list', [('atom', 'a')]))
     t("(a 1 2)", ('list', [('atom', 'a'),
-                           ('num', 1),
-                           ('num', 2)]))
+                           ('int', 1),
+                           ('int', 2)]))
     t("(+ 2 3)", ('list', [('atom', '+'),
-                           ('num', 2),
-                           ('num', 3)]))
+                           ('int', 2),
+                           ('int', 3)]))
     t("(a 1 (b foo x3))",
       ('list', [('atom', 'a'),
-                ('num', 1),
+                ('int', 1),
                 ('list', [('atom', 'b'),
                           ('atom', 'foo'),
                           ('atom', 'x3')])]))
@@ -41,23 +42,23 @@ def test_parse_str():
     t("(+ (* 2 4) (+ 3 5))",
       ('list', [('atom', '+'),
                 ('list', [('atom', '*'),
-                          ('num', 2),
-                          ('num', 4)]),
+                          ('int', 2),
+                          ('int', 4)]),
                 ('list', [('atom', '+'),
-                          ('num', 3),
-                          ('num', 5)])]))
+                          ('int', 3),
+                          ('int', 5)])]))
 
 def test_evalu():
     def t(a, b):
         teq(evalu(a, {}), b)
-    t(('num', 1234), ('num', 1234))
-    t(('num', 1234), ('num', 1234))
+    t(('int', 1234), ('int', 1234))
+    t(('int', 1234), ('int', 1234))
     t(('bool', True), ('bool', True))
     t(('bool', False), ('bool', False))
     t(('atom', '+'), ('intproc', '+'))
     t(('list', [('atom', 'quote'),
-                ('num', 3)]),
-      ('num', 3))
+                ('int', 3)]),
+      ('int', 3))
     t(('list', [('atom', 'quote'),
                 ('list', [('atom', 'a'),
                           ('atom', 'b'),
@@ -110,4 +111,13 @@ def test_define():
             "Environment mismatch: '%s' vs '%s'" %
             (env, env1))
 
-    t("(define size 2)", "", {'size': ('num', 2)})
+    t("(define size 2)", "", {'size': ('int', 2)})
+# FIXME: Add test for this:
+# scheme> (define pi 3.14159)
+# scheme> (define radius 10)
+# scheme> (* pi (* radius radius))
+# 314.159
+# scheme> (define circumference (* 2 pi radius))
+# scheme> circumference
+# 62.8318
+# scheme>

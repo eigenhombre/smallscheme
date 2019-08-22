@@ -10,7 +10,7 @@ parser = lark.Lark(
 start       : _expr
 _exprs      : ( _expr _whitespace )* _expr
 _expr       : ATOM
-            | NUM
+            | _num
             | BOOL
             | list
 TRUE        : "#t"
@@ -18,7 +18,9 @@ FALSE       : "#f"
 BOOL        : TRUE | FALSE
 list        : "(" _exprs? ")"
 ATOM        : /[a-zA-Z\+\*\-\/]+[a-zA-Z0-9]*/
-NUM         : /[0-9]+/
+INT         : /[0-9]+/
+FLOAT       : /[0-9]+\.[0-9]*/
+_num        : INT | FLOAT
 _whitespace : (" " | /\t/ )+
     ''')
 
@@ -30,8 +32,10 @@ def convert_ast(ast):
             return ('list', [convert_ast(x) for x in ast.children])
     if type(ast) is lark.lexer.Token:
         ty = ast.type.lower()
-        if ty == "num":
+        if ty == "int":
             return (ty, int(ast.value))
+        if ty == "float":
+            return (ty, float(ast.value))
         elif ty == "bool":
             return (ty, True if ast.value == "#t" else False)
         else:
@@ -47,19 +51,34 @@ def parse_str(x):
     # A bit of a hack, maybe handle newlines directly in parser:
     return convert_ast(parser.parse(x.replace("\n", " ")))
 
+def argstype(args):
+    # FIXME: Unit test for argument types
+    arglist = [x for (x, _) in args]
+    argset = set(arglist)
+    if argset == {'int', 'float'} or argset == {'float'}:
+        return 'float'
+    elif argset == {'int'}:
+        return 'int'
+    else:
+        raise Exception("Bad numeric arg list: '%s'"
+                        % arglist)
+
 def plus(args):
-    return ('num', sum(x for (_, x) in args))
+    return (argstype(args),
+            sum(x for (_, x) in args))
 
 def times(args):
-    return ('num', reduce(operator.mul,
-                          (x for (_, x) in args),
-                          1))
+    return (argstype(args),
+            reduce(operator.mul,
+                   (x for (_, x) in args),
+                   1))
 
 def minus(args):
-    return ('num', args[0][1] - sum(x for (_, x) in args[1:]))
+    return (argstype(args),
+            args[0][1] - sum(x for (_, x) in args[1:]))
 
 def divide(args):
-    return ('num',
+    return (argstype(args),
             args[0][1] // reduce(operator.mul,
                                  (x for (_, x) in args[1:]),
                                  1))
@@ -76,7 +95,7 @@ def dispatch(fn_name, args):
 
 def evalu(ast, env):
     k, v = ast
-    if k == 'num' or k == 'bool':
+    if k == 'int' or k == 'float' or k == 'bool':
         return ast
     if k == 'atom':
         if v in ['+', '-', '/', '*']:
@@ -92,7 +111,7 @@ def evalu(ast, env):
             k1, v1 = v[1]
             if k1 != 'atom':
                 raise Exception("Don't know how to bind '%s'!" % k1)
-            env[v1] = v[2]
+            env[v1] = evalu(v[2], env)
             return ('nop', None)
         else:
             (_, fn_name) = v[0]
@@ -101,7 +120,7 @@ def evalu(ast, env):
 
 def printable_value(ast):
     k, v = ast
-    if k == 'num':
+    if k == 'int' or k == 'float':
         return str(v)
     if k == 'bool':
         return {True: "#t",

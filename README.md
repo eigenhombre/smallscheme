@@ -6,7 +6,7 @@ smallscheme
 A tiny scheme written in Python to prepare for
 [this class](https://www.dabeaz.com/sicp.html).
 
-Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **7**.
+Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **11**.
 
 Setup
 -----
@@ -23,7 +23,7 @@ REPL
 
 Use `rlwrap` if you want history and that sort of thing:
 
-    rlwrap ./smallscheme/scheme.py
+    $ rlwrap ./smallscheme/scheme.py
     scheme> (quote (1 2 3 (a b c)))
     (1 2 3 (a b c))
     scheme> (+ 1 2)
@@ -36,14 +36,23 @@ Use `rlwrap` if you want history and that sort of thing:
     Internal procedure '+'
     scheme> /
     Internal procedure '/'
+    scheme> (define pi 3.14159)
+    scheme> (define radius 10)
+    scheme> (* pi (* radius radius))
+    314.159
+    scheme> (define circumference (* 2 pi radius))
+    scheme> circumference
+    62.8318
     scheme> ^D
+    $
+
 
 Done
 ----
 1. Lexing of atoms and s-expressions
 1. Parsing of same
 1. Eval of booleans
-1. Eval of (natural) numbers
+1. Floating point and ints
 1. Eval of lists
 1. Function application
 1. `(define ...)` for atoms, and first steps at a scope/runtime context
