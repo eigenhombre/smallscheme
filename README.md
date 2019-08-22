@@ -9,6 +9,31 @@ Setup
 
 `pip install -r requirements.txt`
 
+Tests
+-----
+
+`nosetests`
+
+REPL
+----
+
+Use `rlwrap` if you want history and that sort of thing:
+
+    rlwrap ./smallscheme/scheme.py
+    scheme> (quote (1 2 3 (a b c)))
+    (1 2 3 (a b c))
+    scheme> (+ 1 2)
+    3
+    scheme> (+ (* 2 4) (+ 3 5))
+    16
+    scheme> (/ 16 2 2 2)
+    2
+    scheme> +
+    Internal procedure '+'
+    scheme> /
+    Internal procedure '/'
+    scheme> ^D
+
 Done
 ----
 1. Lexing of atoms and s-expressions
