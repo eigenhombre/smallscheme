@@ -2,12 +2,12 @@ image: ubuntu/disco
 sources:
 - https://git.sr.ht/~eigenhombre/smallscheme
 tasks:
-- pip: |
+- installpip: |
     sudo apt-get install -y python-pip
-- deps: |
+- pythondeps: |
     cd smallscheme
     pip install -r requirements.txt
-- nose: |
+- nosetests: |
     cd smallscheme
     export PATH=$PATH:$HOME/.local/bin
     nosetests -s
