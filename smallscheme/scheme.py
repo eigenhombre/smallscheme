@@ -1,47 +1,51 @@
 #!/usr/bin/env python
 
-import re
+import lark
 import operator
+import re
 from functools import reduce
+
+parser = lark.Lark(
+    '''
+start       : _expr
+_exprs      : ( _expr _whitespace )* _expr
+_expr       : ATOM
+            | NUM
+            | BOOL
+            | list
+TRUE        : "#t"
+FALSE       : "#f"
+BOOL        : TRUE | FALSE
+list        : "(" _exprs? ")"
+ATOM        : /[a-zA-Z\+\*\-\/]+[a-zA-Z0-9]*/
+NUM         : /[0-9]+/
+_whitespace : (" " | /\t/ )+
+    ''')
+
+def convert_ast(ast):
+    if type(ast) is lark.tree.Tree:
+        if ast.data == "start":
+            return convert_ast(ast.children[0])
+        if ast.data == "list":
+            return ('list', [convert_ast(x) for x in ast.children])
+    if type(ast) is lark.lexer.Token:
+        ty = ast.type.lower()
+        if ty == "num":
+            return (ty, int(ast.value))
+        elif ty == "bool":
+            return (ty, True if ast.value == "#t" else False)
+        else:
+            return (ast.type.lower(), ast.value)
+    raise Exception("Unparsed AST: '%s'" % ast)
 
 def remove_nil_keys(m):
     for k, v in m.items():
         if v is not None:
             return k, v
 
-pat = ("(?ms)^\s*\((?P<list>.*)\)$"
-       "|"
-       "(?P<bool>(\#t|\#f))\s*"
-       "|"
-       "(?P<atom>[a-zA-Z\+\-\*\/]+[a-zA-Z0-9\+\-\*\/]*)\s*"
-       "|"
-       "(?P<num>[0-9]+)\s*")
-
-def parse_list_body(body_str):
-    ret = []
-    while body_str:
-        m, remaining = reduce1(body_str)
-        ret.append(m)
-        if not remaining:
-            break
-        body_str = remaining
-    return ret
-
-def reduce1(x):
-    match = re.search(pat, x)
-    assert match, "Invalid input '%s'!" % x
-    k, v = remove_nil_keys(re.search(pat, x).groupdict())
-    if k == 'num':
-        v = int(v)
-    if k == 'bool':
-        v = True if v == "#t" else False
-    if k == 'list':
-        v = parse_list_body(v)
-    remaining = x[match.end():]
-    return (k, v), remaining
-
 def parse_str(x):
-    return reduce1(x)[0]
+    # A bit of a hack, maybe handle newlines directly in parser:
+    return convert_ast(parser.parse(x.replace("\n", " ")))
 
 def plus(args):
     return ('num', sum(x for (_, x) in args))
@@ -54,10 +58,17 @@ def times(args):
 def minus(args):
     return ('num', args[0][1] - sum(x for (_, x) in args[1:]))
 
+def divide(args):
+    return ('num',
+            args[0][1] // reduce(operator.mul,
+                                 (x for (_, x) in args[1:]),
+                                 1))
+
 def dispatch(fn_name, args):
     fn = {'+': plus,
           '*': times,
-          '-': minus}.get(fn_name, None)
+          '-': minus,
+          '/': divide}.get(fn_name, None)
     if fn is None:
         raise Exception('Unknown function name: "%s"'
                         % fn_name)
@@ -67,8 +78,8 @@ def evalu(ast):
     k, v = ast
     if k == 'num' or k == 'bool':
         return ast
-    if k == 'atom' and v == '+':
-        return ('intproc', '+')
+    if k == 'atom' and v in ['+', '-', '/', '*']:
+        return ('intproc', v)
     if k == 'list':
         if not v:
             return ('list', [])

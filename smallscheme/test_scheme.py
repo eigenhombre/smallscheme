@@ -7,10 +7,10 @@ def teq(a, b):
 def test_parse_str():
     def t(a, b):
         teq(parse_str(a), b)
+    t("1234", ('num', 1234))
     t("x", ('atom', 'x'))
     t("y", ('atom', 'y'))
     t("yxyz", ('atom', 'yxyz'))
-    t("1234", ('num', 1234))
     t("#t", ("bool", True))
     t("#f", ("bool", False))
     t("(a)", ('list', [('atom', 'a')]))
@@ -32,22 +32,20 @@ def test_parse_str():
                                      ('atom', 'b')])]))
     t("(a (b))", ("list", [("atom", "a"),
                            ("list", [("atom", "b")])]))
-    # FIXME:
-    # SFTC:
-    # t("((a) b)", ("list", [("list", [("atom", "a")]),
-    #                        ("atom", "b")]))
-    # t("(a (b c) d)", ('list', [('atom', 'a'),
-    #                            ('list', [('atom', 'b'),
-    #                                      ('atom', 'c')]),
-    #                            ('atom', 'd')]))
-    # t("(+ (* 2 4) (+ 3 5))",
-    #   ('list', [('atom', '+'),
-    #             ('list', [('atom', '*'),
-    #                       ('num', 2),
-    #                       ('num', 4)]),
-    #             ('list', [('atom', '+'),
-    #                       ('num', 3),
-    #                       ('num', 5)])]))
+    t("((a) b)", ("list", [("list", [("atom", "a")]),
+                           ("atom", "b")]))
+    t("(a (b c) d)", ('list', [('atom', 'a'),
+                               ('list', [('atom', 'b'),
+                                         ('atom', 'c')]),
+                               ('atom', 'd')]))
+    t("(+ (* 2 4) (+ 3 5))",
+      ('list', [('atom', '+'),
+                ('list', [('atom', '*'),
+                          ('num', 2),
+                          ('num', 4)]),
+                ('list', [('atom', '+'),
+                          ('num', 3),
+                          ('num', 5)])]))
 
 def test_evalu():
     def t(a, b):
@@ -76,6 +74,7 @@ def test_printable_value():
     t("#f", "#f")
     t("#t", "#t")
     t("+", "Internal procedure '+'")
+    t("/", "Internal procedure '/'")
     t("(quote a)", "a")
     t("()", "()")
     t("(quote 0)", "0")
@@ -90,12 +89,13 @@ def test_printable_value():
             2
             3)""", "6")
     t("(- 10 7)", "3")
+    t("(/ 10 5)", "2")
+    t("(/ 16 2 2 2)", "2")
     t("(+ 3 5)", "8")
     t("(* 2 4)", "8")
-    # FIXME:
-    #t("(+ (* 2 4) (+ 3 5))", "16")
-    # t("""(+ (* 3
-    #            (+ (* 2 4)
-    #               (+ 3 5)))
-    #         (+ (- 10 7)
-    #            6))""", "3")
+    t("(+ (* 2 4) (+ 3 5))", "16")
+    t("""(+ (* 3
+               (+ (* 2 4)
+                  (+ 3 5)))
+            (+ (- 10 7)
+               6))""", "57")
