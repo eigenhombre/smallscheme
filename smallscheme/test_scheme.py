@@ -112,12 +112,16 @@ def test_define():
             (env, env1))
 
     t("(define size 2)", "", {'size': ('int', 2)})
-# FIXME: Add test for this:
-# scheme> (define pi 3.14159)
-# scheme> (define radius 10)
-# scheme> (* pi (* radius radius))
-# 314.159
-# scheme> (define circumference (* 2 pi radius))
-# scheme> circumference
-# 62.8318
-# scheme>
+
+def test_multiple_defines():
+    env = {}
+    # Adapted from SICP p. 8:
+    evalu(parse_str("(define pi 3.14159)"), env)
+    evalu(parse_str("(define radius 10)"), env)
+    teq(printable_value(evalu(parse_str(
+        "(* pi (* radius radius))"), env)),
+        "314.159")
+    evalu(parse_str("(define circumference (* 2 pi radius))"),
+          env)
+    teq(printable_value(evalu(parse_str(
+        "circumference"), env)), "62.8318")
