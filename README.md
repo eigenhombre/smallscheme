@@ -1,6 +1,8 @@
 smallscheme
 ===========
 
+[![builds.sr.ht status](https://builds.sr.ht/~eigenhombre/smallscheme/unstable.svg)](https://builds.sr.ht/~eigenhombre/smallscheme/unstable?)
+
 A tiny scheme written in Python to prepare for
 [this class](https://www.dabeaz.com/sicp.html).
 
