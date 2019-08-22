@@ -6,6 +6,8 @@ smallscheme
 A tiny scheme written in Python to prepare for
 [this class](https://www.dabeaz.com/sicp.html).
 
+Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **7**.
+
 Setup
 -----
 

@@ -49,7 +49,7 @@ def test_parse_str():
 
 def test_evalu():
     def t(a, b):
-        teq(evalu(a), b)
+        teq(evalu(a, {}), b)
     t(('num', 1234), ('num', 1234))
     t(('num', 1234), ('num', 1234))
     t(('bool', True), ('bool', True))
@@ -68,7 +68,8 @@ def test_evalu():
 
 def test_printable_value():
     def t(a, b):
-        teq(printable_value(evalu(parse_str(a))), b)
+        teq(printable_value(evalu(parse_str(a),
+                                  {})), b)
 
     t("1234", "1234")
     t("#f", "#f")
@@ -99,3 +100,14 @@ def test_printable_value():
                   (+ 3 5)))
             (+ (- 10 7)
                6))""", "57")
+
+def test_define():
+    def t(a, b, env1):
+        env = {}
+        teq(printable_value(evalu(parse_str(a),
+                                  env)), b)
+        assert env == env1, (
+            "Environment mismatch: '%s' vs '%s'" %
+            (env, env1))
+
+    t("(define size 2)", "", {'size': ('num', 2)})

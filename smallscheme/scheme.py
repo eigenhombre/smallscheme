@@ -74,20 +74,29 @@ def dispatch(fn_name, args):
                         % fn_name)
     return fn(args)
 
-def evalu(ast):
+def evalu(ast, env):
     k, v = ast
     if k == 'num' or k == 'bool':
         return ast
-    if k == 'atom' and v in ['+', '-', '/', '*']:
-        return ('intproc', v)
+    if k == 'atom':
+        if v in ['+', '-', '/', '*']:
+            return ('intproc', v)
+        elif v in env:
+            return env[v]
     if k == 'list':
         if not v:
             return ('list', [])
         elif v[0] == ('atom', 'quote'):
             return v[1]
+        elif v[0] == ('atom', 'define'):
+            k1, v1 = v[1]
+            if k1 != 'atom':
+                raise Exception("Don't know how to bind '%s'!" % k1)
+            env[v1] = v[2]
+            return ('nop', None)
         else:
             (_, fn_name) = v[0]
-            return dispatch(fn_name, [evalu(x) for x in v[1:]])
+            return dispatch(fn_name, [evalu(x, env) for x in v[1:]])
     raise Exception('evaluation error: "%s"' % str(ast))
 
 def printable_value(ast):
@@ -104,9 +113,12 @@ def printable_value(ast):
     if k == 'list':
         return '(' + ' '.join([printable_value(x)
                                 for x in v]) + ')'
-    raise Exception('Unprintable ast "%s"' % ast)
+    if k == 'nop':
+        return ''
+    raise Exception('Unprintable ast "%s"' % str(ast))
 
 def repl():
+    env = {}
     while True:
         try:
             x = input("scheme> ").strip()
@@ -114,7 +126,12 @@ def repl():
             print()
             break
         if x:
-            print(printable_value(evalu(parse_str(x))))
+            try:
+                pv = printable_value(evalu(parse_str(x), env))
+                if pv:
+                    print(pv)
+            except Exception as e:
+                print(e)
 
 if __name__ == "__main__":
     repl()
