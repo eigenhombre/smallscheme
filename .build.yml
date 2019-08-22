@@ -3,11 +3,12 @@ sources:
 - https://git.sr.ht/~eigenhombre/smallscheme
 tasks:
 - installpip: |
-    sudo apt-get install -y python-pip
+    sudo apt-get -qq install python-pip
 - pythondeps: |
     cd smallscheme
-    pip install -r requirements.txt
+    export PATH=$PATH:$HOME/.local/bin
+    pip install -q -r requirements.txt
 - nosetests: |
     cd smallscheme
     export PATH=$PATH:$HOME/.local/bin
-    nosetests -s
+    nosetests -vs
