@@ -1,0 +1,13 @@
+image: ubuntu/disco
+sources:
+- https://git.sr.ht/~eigenhombre/smallscheme
+tasks:
+- pip: |
+    sudo apt-get install -y python-pip
+- deps: |
+    cd smallscheme
+    pip install -r requirements.txt
+- nose: |
+    cd smallscheme
+    export PATH=$PATH:$HOME/.local/bin
+    nosetests -s
