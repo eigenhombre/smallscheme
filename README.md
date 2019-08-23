@@ -65,18 +65,14 @@ Use `rlwrap` if you want history and that sort of thing:
 
 Done
 ----
-1. Lexing of atoms and s-expressions
-1. Parsing of same
-1. Eval of booleans
-1. Floating point and ints
-1. Eval of lists
-1. Function application
-1. `(define ...)` for atoms, and first steps at a scope/runtime context
-1. Eval of (non-built-in) atoms
-1. `(define ... )` for "procedures" (functions)
-1. `+ - / * = < >`
-1. `cond`, `if`, `not`, `and`, `or`.
-
+1. Lexing and parsing of atoms and s-expressions
+1. Read-Eval-Print
+1. Special forms
+   1. `quote`
+   1. `if` / `cond`
+   1. `define`
+   1. `or` / `and`
+1. Functions `+ - / * = < > not`
 
 Next steps
 -----
