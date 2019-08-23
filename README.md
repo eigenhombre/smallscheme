@@ -71,6 +71,7 @@ Done
 1. `(define ...)` for atoms, and first steps at a scope/runtime context
 1. Eval of (non-built-in) atoms
 1. `(define ... )` for "procedures" (functions)
+1. `+ - / * =`
 
 To Do
 -----

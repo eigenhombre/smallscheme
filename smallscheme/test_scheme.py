@@ -101,6 +101,10 @@ def test_printable_value():
                   (+ 3 5)))
             (+ (- 10 7)
                6))""", "57")
+    t("(= 1 1)", "#t")
+    t("(= 1 2)", "#f")
+    t("(= 1 (quote notone))", "#f")
+    t("(= #t #t)", "#t")
 
 def test_define():
     def t(a, b, env1):

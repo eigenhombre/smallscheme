@@ -17,7 +17,7 @@ TRUE        : "#t"
 FALSE       : "#f"
 BOOL        : TRUE | FALSE
 list        : "(" _exprs? ")"
-ATOM        : /[a-zA-Z\+\*\-\/]+[a-zA-Z0-9]*/
+ATOM        : /[a-zA-Z\+\*\-\/\=]+[a-zA-Z0-9]*/
 INT         : /[0-9]+/
 FLOAT       : /[0-9]+\.[0-9]*/
 _num        : INT | FLOAT
@@ -83,11 +83,18 @@ def divide(args):
                                  (x for (_, x) in args[1:]),
                                  1))
 
+def equals(args):
+    return ('bool', operator.eq(*args))
+
+dispatch_table = {'+': plus,
+                  '*': times,
+                  '-': minus,
+                  '/': divide,
+                  '=': equals}
+
 def dispatch(fn_atom, env, args):
-    fn = {'+': plus,
-          '*': times,
-          '-': minus,
-          '/': divide}.get(fn_atom[1], None)
+    _, fn_name = fn_atom
+    fn = dispatch_table.get(fn_name, None)
     if fn is not None:
         return fn(args)
     if fn_atom in env:
@@ -105,10 +112,6 @@ def dispatch(fn_atom, env, args):
         for i, x in enumerate(arg_names):
             new_env[x[1]] = args[i]
         return evalu(rest, new_env)
-    fn = {'+': plus,
-          '*': times,
-          '-': minus,
-          '/': divide}.get(fn_atom[1], None)
     raise Exception('Unknown function name: "%s"'
                     % fn_name)
 
@@ -117,16 +120,19 @@ def evalu(ast, env):
     if k == 'int' or k == 'float' or k == 'bool':
         return ast
     if k == 'atom':
-        if v in ['+', '-', '/', '*']:
+        if v in dispatch_table.keys():
             return ('intproc', v)
         elif v in env:
             return env[v]
     if k == 'list':
+        # Empty list:
         if not v:
             return ('list', [])
-        elif v[0] == ('atom', 'quote'):
+        # Special forms:
+        car = v[0]
+        if car == ('atom', 'quote'):
             return v[1]
-        elif v[0] == ('atom', 'define'):
+        elif car == ('atom', 'define'):
             k1, v1 = v[1]
             if k1 == 'atom':
                 env[v1] = evalu(v[2], env)
@@ -142,8 +148,8 @@ def evalu(ast, env):
             else:
                 raise Exception("Don't know how to bind '%s'!" % k1)
         else:
-            fn_atom = v[0]
-            return dispatch(fn_atom,
+            # Normal function application:
+            return dispatch(car,
                             env,
                             [evalu(x, env) for x in v[1:]])
     raise Exception('evaluation error: "%s"' % str(ast))
