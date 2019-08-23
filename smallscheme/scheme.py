@@ -17,7 +17,7 @@ TRUE        : "#t"
 FALSE       : "#f"
 BOOL        : TRUE | FALSE
 list        : "(" _exprs? ")"
-ATOM        : /[a-zA-Z\+\*\-\/\=]+[a-zA-Z0-9]*/
+ATOM        : /[a-zA-Z\+\*\-\/\=\>\<]+[a-zA-Z0-9]*/
 INT         : /[0-9]+/
 FLOAT       : /[0-9]+\.[0-9]*/
 _num        : INT | FLOAT
@@ -86,11 +86,27 @@ def divide(args):
 def equals(args):
     return ('bool', operator.eq(*args))
 
+def compare(args, oper):
+    ((ty1, v1), (ty2, v2)) = args[:2]
+    if ((ty1 != 'int' and ty1 != 'float') or
+        (ty2 != 'int' and ty2 != 'float')):
+        raise Exception("Type error, can't compare '%s' to '%s'!" %
+                        (ty1, ty2))
+    return ('bool', oper(v1, v2))
+
+def lessthan(args):
+    return compare(args, operator.lt)
+
+def greaterthan(args):
+    return compare(args, operator.gt)
+
 dispatch_table = {'+': plus,
                   '*': times,
                   '-': minus,
                   '/': divide,
-                  '=': equals}
+                  '=': equals,
+                  '<': lessthan,
+                  '>': greaterthan}
 
 def dispatch(fn_atom, env, args):
     _, fn_name = fn_atom
