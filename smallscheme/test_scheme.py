@@ -164,6 +164,10 @@ def test_multiple_defines():
     # p. 19:
     e("(define x 7)")
     t("(and (> x 5) (< x 10))", "#t")
+    t("(car (quote (1 2 3)))", "1")
+    t("(car (quote (a b c)))", "a")
+    t("(cdr (quote (1 2 3)))", "(2 3)")
+    t("(cdr (quote (a b c)))", "(b c)")
 
 def test_define_function():
     env = {}

@@ -43,11 +43,6 @@ def convert_ast(ast):
             return (ast.type.lower(), ast.value)
     raise Exception("Unparsed AST: '%s'" % ast)
 
-def remove_nil_keys(m):
-    for k, v in m.items():
-        if v is not None:
-            return k, v
-
 def parse_str(x):
     # A bit of a hack, maybe handle newlines directly in parser:
     return convert_ast(parser.parse(x.replace("\n", " ")))
@@ -110,6 +105,20 @@ def notnot(args):
     else:
         return ('bool', False)
 
+def car(x):
+    typ, l = x[0]
+    if typ != 'list':
+        raise Exception("Can't take car of '%s'!"
+                        % x)
+    return l[0]
+
+def cdr(x):
+    typ, l = x[0]
+    if typ != 'list':
+        raise Exception("Can't take car of '%s'!"
+                        % x)
+    return ('list', l[1:])
+
 dispatch_table = {'+': plus,
                   '*': times,
                   '-': minus,
@@ -117,7 +126,9 @@ dispatch_table = {'+': plus,
                   '=': equals,
                   '<': lessthan,
                   '>': greaterthan,
-                  'not': notnot}
+                  'not': notnot,
+                  'car': car,
+                  'cdr': cdr}
 
 def dispatch(fn_atom, env, args):
     _, fn_name = fn_atom
