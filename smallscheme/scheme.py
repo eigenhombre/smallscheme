@@ -104,13 +104,20 @@ def lessthan(args):
 def greaterthan(args):
     return compare(args, operator.gt)
 
+def notnot(args):
+    if args[0] == ('bool', False):
+        return ('bool', True)
+    else:
+        return ('bool', False)
+
 dispatch_table = {'+': plus,
                   '*': times,
                   '-': minus,
                   '/': divide,
                   '=': equals,
                   '<': lessthan,
-                  '>': greaterthan}
+                  '>': greaterthan,
+                  'not': notnot}
 
 def dispatch(fn_atom, env, args):
     _, fn_name = fn_atom

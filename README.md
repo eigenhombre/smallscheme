@@ -72,11 +72,10 @@ Done
 1. Eval of (non-built-in) atoms
 1. `(define ... )` for "procedures" (functions)
 1. `+ - / * = < >`
-1. `cond` and `if`
+1. `cond`, `if`, `not`.
 
 To Do
 -----
-1. `not`
 1. `and`
 1. `or`
-1. Everything else in Scheme
+1. ... everything else ....
