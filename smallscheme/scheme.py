@@ -83,15 +83,34 @@ def divide(args):
                                  (x for (_, x) in args[1:]),
                                  1))
 
-def dispatch(fn_name, args):
+def dispatch(fn_atom, env, args):
     fn = {'+': plus,
           '*': times,
           '-': minus,
-          '/': divide}.get(fn_name, None)
-    if fn is None:
-        raise Exception('Unknown function name: "%s"'
-                        % fn_name)
-    return fn(args)
+          '/': divide}.get(fn_atom[1], None)
+    if fn is not None:
+        return fn(args)
+    if fn_atom in env:
+        binding = env[fn_atom]
+        (maybe_list,
+         ((maybe_atom, maybe_lambda),
+          (maybe_list, arg_names),
+          rest)) = binding
+        if (maybe_list != 'list' or
+            maybe_atom != 'atom' or
+            maybe_lambda != 'lambda'):
+            raise Exception('Malformed function definition "%s"!'
+                            % binding)
+        new_env = env.copy()
+        for i, x in enumerate(arg_names):
+            new_env[x[1]] = args[i]
+        return evalu(rest, new_env)
+    fn = {'+': plus,
+          '*': times,
+          '-': minus,
+          '/': divide}.get(fn_atom[1], None)
+    raise Exception('Unknown function name: "%s"'
+                    % fn_name)
 
 def evalu(ast, env):
     k, v = ast
@@ -109,13 +128,24 @@ def evalu(ast, env):
             return v[1]
         elif v[0] == ('atom', 'define'):
             k1, v1 = v[1]
-            if k1 != 'atom':
+            if k1 == 'atom':
+                env[v1] = evalu(v[2], env)
+                return ('nop', None)
+            elif k1 == 'list':
+                fn_name, args = v1[0], v1[1:]
+                lambd = ('list', [
+                    ('atom', 'lambda'),
+                    ('list', args),
+                    v[2]])
+                env[v1[0]] = lambd
+                return ('nop', None)
+            else:
                 raise Exception("Don't know how to bind '%s'!" % k1)
-            env[v1] = evalu(v[2], env)
-            return ('nop', None)
         else:
-            (_, fn_name) = v[0]
-            return dispatch(fn_name, [evalu(x, env) for x in v[1:]])
+            fn_atom = v[0]
+            return dispatch(fn_atom,
+                            env,
+                            [evalu(x, env) for x in v[1:]])
     raise Exception('evaluation error: "%s"' % str(ast))
 
 def printable_value(ast):

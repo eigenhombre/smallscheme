@@ -6,7 +6,7 @@ smallscheme
 A tiny scheme written in Python to prepare for
 [this class](https://www.dabeaz.com/sicp.html).
 
-Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **11**.
+Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **16**.
 
 Setup
 -----
@@ -43,6 +43,19 @@ Use `rlwrap` if you want history and that sort of thing:
     scheme> (define circumference (* 2 pi radius))
     scheme> circumference
     62.8318
+    scheme> (define (square x) (* x x))
+    scheme> (square 10)
+    100
+    scheme> (square (+ 2 5))
+    49
+    scheme> (square (square 3))
+    81
+    scheme> (define (sum-of-squares x y) (+ (square x) (square y)))
+    scheme> (sum-of-squares 3 4)
+    25
+    scheme> (define (f a) (sum-of-squares (+ a 1) (* a 2)))
+    scheme> (f 5)
+    136
     scheme> ^D
     $
 
@@ -57,9 +70,9 @@ Done
 1. Function application
 1. `(define ...)` for atoms, and first steps at a scope/runtime context
 1. Eval of (non-built-in) atoms
+1. `(define ... )` for "procedures" (functions)
 
 To Do
 -----
 1. Boolean `not` and special forms `and` and `or`
-1. `(define ... )` for "procedures" (functions)
 1. Everything else in Scheme

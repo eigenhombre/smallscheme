@@ -125,3 +125,24 @@ def test_multiple_defines():
           env)
     teq(printable_value(evalu(parse_str(
         "circumference"), env)), "62.8318")
+
+def test_define_function():
+    env = {}
+    def e(s):
+        evalu(parse_str(s), env)
+    def t(s1, s2):
+        teq(printable_value(evalu(parse_str(
+            s1), env)), s2)
+
+    e("(define (square x) (* x x))")
+    e("(define (f x y) (+ x y))")
+    e("(define z 33)")
+    t("(square 21)", "441")
+    t("(square (+ 2 5))", "49")
+    t("(square (square 3))", "81")
+    e("""(define (sum-of-squares x y)
+           (+ (square x) (square y)))""")
+    t("(sum-of-squares 3 4)", "25")
+    e("""(define (f a)
+           (sum-of-squares (+ a 1) (* a 2)))""")
+    t("(f 5)", "136")
