@@ -6,7 +6,7 @@ smallscheme
 A tiny scheme written in Python to prepare for
 [this class](https://www.dabeaz.com/sicp.html).
 
-Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **16**.
+Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **26**.
 
 Setup
 -----
@@ -72,10 +72,10 @@ Done
 1. Eval of (non-built-in) atoms
 1. `(define ... )` for "procedures" (functions)
 1. `+ - / * = < >`
-1. `cond`, `if`, `not`.
+1. `cond`, `if`, `not`, `and`, `or`.
 
-To Do
+
+Next steps
 -----
-1. `and`
-1. `or`
-1. ... everything else ....
+1. Add program file evaluation (e.g., `smallscheme.py myprog.scm`)
+1. Keep following along in SICP and adding functionality

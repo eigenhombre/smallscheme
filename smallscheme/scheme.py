@@ -17,7 +17,7 @@ TRUE        : "#t"
 FALSE       : "#f"
 BOOL        : TRUE | FALSE
 list        : "(" _exprs? ")"
-ATOM        : /[a-zA-Z]+[a-zA-Z0-9\-]*/
+ATOM        : /[a-zA-Z]+[a-zA-Z0-9\-\?]*/
             | /[\+\*\/\-\=\>\<]/
 INT         : /[-+]?[0-9]+/
 FLOAT       : /[-+]?[0-9]+\.[0-9]*/
@@ -142,6 +142,9 @@ def dispatch(fn_atom, env, args):
     raise Exception('Unknown function name: "%s"'
                     % fn_name)
 
+def truthy(x):
+    return x != ('bool', False)
+
 def evalu(ast, env):
     k, v = ast
     if k == 'int' or k == 'float' or k == 'bool':
@@ -174,7 +177,7 @@ def evalu(ast, env):
         # FIXME: cond should macroexpand to if or vice-versa?
         if car == ('atom', 'if'):
             pred = v[1]
-            if evalu(pred, env) != ('bool', False):
+            if truthy(evalu(pred, env)):
                 return evalu(v[2], env)
             else:
                 return evalu(v[3], env)
@@ -193,6 +196,22 @@ def evalu(ast, env):
                 return ('nop', None)
             else:
                 raise Exception("Don't know how to bind '%s'!" % k1)
+        elif car == ('atom', 'or'):
+            for arg in v[1:]:
+                ev = evalu(arg, env)
+                if truthy(ev):
+                    return ev
+            return ('bool', False)
+        elif car == ('atom', 'and'):
+            ev = None
+            for arg in v[1:]:
+                ev = evalu(arg, env)
+                if not truthy(ev):
+                    return ('bool', False)
+            if ev is None:
+                return ('bool', True)
+            else:
+                return ev
         else:
             # Normal function application:
             return dispatch(car,

@@ -126,6 +126,16 @@ def test_printable_value():
     t("(cond (#f #f) (else #t))", "#t")
     t("(if #t 1 2)", "1")
     t("(if #f 1 2)", "2")
+    t("(or)", "#f")
+    t("(or 1)", "1")
+    t("(or #f 1)", "1")
+    t("(or 1 1)", "1")
+    t("(and)", "#t")
+    t("(and #t)", "#t")
+    t("(and 1 #t)", "#t")
+    t("(and #t 1)", "1")
+    t("(and #t #f)", "#f")
+    t("(and #f #f)", "#f")
 
 def test_define():
     def t(a, b, env1):
@@ -140,16 +150,20 @@ def test_define():
 
 def test_multiple_defines():
     env = {}
+    def e(s):
+        evalu(parse_str(s), env)
+    def t(s1, s2):
+        teq(printable_value(evalu(parse_str(
+            s1), env)), s2)
     # Adapted from SICP p. 8:
-    evalu(parse_str("(define pi 3.14159)"), env)
-    evalu(parse_str("(define radius 10)"), env)
-    teq(printable_value(evalu(parse_str(
-        "(* pi (* radius radius))"), env)),
-        "314.159")
-    evalu(parse_str("(define circumference (* 2 pi radius))"),
-          env)
-    teq(printable_value(evalu(parse_str(
-        "circumference"), env)), "62.8318")
+    e("(define pi 3.14159)")
+    e("(define radius 10)")
+    t("(* pi (* radius radius))", "314.159")
+    e("(define circumference (* 2 pi radius))")
+    t("circumference", "62.8318")
+    # p. 19:
+    e("(define x 7)")
+    t("(and (> x 5) (< x 10))", "#t")
 
 def test_define_function():
     env = {}
@@ -171,20 +185,52 @@ def test_define_function():
     e("""(define (f a)
            (sum-of-squares (+ a 1) (* a 2)))""")
     t("(f 5)", "136")
+
     e("""(define (abs x)
            (cond ((> x 0) x)
                  ((= x 0) 0)
                  ((< x 0) (- x))))""")
     t("(abs 10)", "10")
     t("(abs -10)", "10")
+
     e("""(define (abs x)
            (cond ((< x 0) (- x))
                  (else x)))""")
     t("(abs 10)", "10")
     t("(abs -10)", "10")
+
     e("""(define (abs x)
            (if (< x 0)
                (- x)
                x))""")
     t("(abs 10)", "10")
     t("(abs -10)", "10")
+
+    e("""(define (fact n)
+           (if (< n 2)
+               n
+               (* n (fact (- n 1)))))""")
+    t("(fact 1)", "1")
+    t("(fact 2)", "2")
+    t("(fact 3)", "6")
+    t("(fact 10)", "3628800")
+
+    # P. 23-24:
+    e("""(define (sqrt-iter guess x)
+           (if (good-enough? guess x)
+               guess
+               (sqrt-iter (improve guess x)
+                          x)))""")
+    e("""(define (improve guess x)
+           (average guess (/ x guess)))""")
+    e("""(define (average x y)
+           (/ (+ x y) 2))""")
+    e("""(define (good-enough? guess x)
+           (< (abs (- (square guess) x)) 0.001))""")
+    e("""(define (sqrt x)
+           (sqrt-iter 1.0 x))""")
+    e("(define (square x) (* x x))")
+    # These may or may not pass; they do on my
+    # Macbook Pro:
+    # t("(sqrt 9)", "3.0")
+    # t("(square (sqrt 100))", "100.0")
