@@ -76,5 +76,5 @@ Done
 
 Next steps
 -----
-1. Add program file evaluation (e.g., `smallscheme.py myprog.scm`)
+1. Add program file evaluation (e.g., `scheme.py myprog.scm`)
 1. Keep following along in SICP and adding functionality
