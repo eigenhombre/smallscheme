@@ -56,6 +56,9 @@ Use `rlwrap` if you want history and that sort of thing:
     scheme> (define (f a) (sum-of-squares (+ a 1) (* a 2)))
     scheme> (f 5)
     136
+    scheme> (define (fact n) (if (< n 2) n (* n (fact (- n 1)))))
+    scheme> (fact 50)
+    30414093201713378043612608166064768844377641568960512000000000000
     scheme> ^D
     $
 
