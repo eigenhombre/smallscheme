@@ -17,9 +17,10 @@ TRUE        : "#t"
 FALSE       : "#f"
 BOOL        : TRUE | FALSE
 list        : "(" _exprs? ")"
-ATOM        : /[a-zA-Z\+\*\-\/\=\>\<]+[a-zA-Z0-9]*/
-INT         : /[0-9]+/
-FLOAT       : /[0-9]+\.[0-9]*/
+ATOM        : /[a-zA-Z]+[a-zA-Z0-9\-]*/
+            | /[\+\*\/\-\=\>\<]/
+INT         : /[-+]?[0-9]+/
+FLOAT       : /[-+]?[0-9]+\.[0-9]*/
 _num        : INT | FLOAT
 _whitespace : (" " | /\t/ )+
     ''')
@@ -74,8 +75,11 @@ def times(args):
                    1))
 
 def minus(args):
-    return (argstype(args),
-            args[0][1] - sum(x for (_, x) in args[1:]))
+    if len(args) == 1:
+        return argstype(args), -args[0][1]
+    else:
+        return (argstype(args),
+                args[0][1] - sum(x for (_, x) in args[1:]))
 
 def divide(args):
     return (argstype(args),
@@ -148,6 +152,25 @@ def evalu(ast, env):
         car = v[0]
         if car == ('atom', 'quote'):
             return v[1]
+        if car == ('atom', 'cond'):
+            clauses = v[1:]
+            for clause in clauses:
+                (maybe_list, clauselist) = clause
+                if maybe_list != 'list':
+                    raise Exception('Cond clause "%s" not a list!"' %
+                                    v[1:])
+                pred = clauselist[0]
+                if (pred == ('atom', 'else') or
+                    evalu(pred, env) != ('bool', False)):
+                    return evalu(clauselist[1], env)
+            return ('bool', True)
+        # FIXME: cond should macroexpand to if or vice-versa?
+        if car == ('atom', 'if'):
+            pred = v[1]
+            if evalu(pred, env) != ('bool', False):
+                return evalu(v[2], env)
+            else:
+                return evalu(v[3], env)
         elif car == ('atom', 'define'):
             k1, v1 = v[1]
             if k1 == 'atom':
