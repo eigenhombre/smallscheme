@@ -74,5 +74,9 @@ Done
 
 To Do
 -----
-1. Boolean `not` and special forms `and` and `or`
+1. `if`
+1. `not`
+1. `cond`
+1. `and`
+1. `or`
 1. Everything else in Scheme
