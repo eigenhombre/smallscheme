@@ -151,8 +151,6 @@ def dispatch(fn_atom, env, args):
             new_env[x[1]] = args[i]
         ret = None
         for form in body:
-            # FIXME: each form can change the environment; need to
-            # reflect that.
             ret = evalu(form, new_env)
         return ret  # Last result is returned
     raise Exception('Unknown function name: "%s"'
@@ -161,78 +159,86 @@ def dispatch(fn_atom, env, args):
 def truthy(x):
     return x != ('bool', False)
 
+def eval_atom(atom_name, env):
+    if atom_name in dispatch_table.keys():
+        return ('intproc', atom_name)
+    elif atom_name in env:
+        return env[atom_name]
+    else:
+        raise Exception("Unbound atom '%s'!" % atom_name)
+
+def eval_list(l, env):
+    # Empty list:
+    if not l:
+        return ('list', [])
+    # Special forms:
+    car = l[0]
+    if car == ('atom', 'quote'):
+        return l[1]
+    if car == ('atom', 'cond'):
+        clauses = l[1:]
+        for clause in clauses:
+            (maybe_list, clauselist) = clause
+            if maybe_list != 'list':
+                raise Exception('Cond clause "%s" not a list!"' %
+                                l[1:])
+            pred = clauselist[0]
+            if (pred == ('atom', 'else') or
+                evalu(pred, env) != ('bool', False)):
+                return evalu(clauselist[1], env)
+        return ('bool', True)
+    # FIXME: cond should macroexpand to if or vice-versa?
+    if car == ('atom', 'if'):
+        pred = l[1]
+        if truthy(evalu(pred, env)):
+            return evalu(l[2], env)
+        else:
+            return evalu(l[3], env)
+    elif car == ('atom', 'define'):
+        k1, v1 = l[1]
+        if k1 == 'atom':
+            env[v1] = evalu(l[2], env)
+            return ('nop', None)
+        elif k1 == 'list':
+            fn_name, args = v1[0], v1[1:]
+            lambd = ('list', [
+                ('atom', 'lambda'),
+                ('list', args),
+                l[2:]])
+            env[v1[0]] = lambd
+            return ('nop', None)
+        else:
+            raise Exception("Don't know how to bind '%s'!" % k1)
+    elif car == ('atom', 'or'):
+        for arg in l[1:]:
+            ev = evalu(arg, env)
+            if truthy(ev):
+                return ev
+        return ('bool', False)
+    elif car == ('atom', 'and'):
+        ev = None
+        for arg in l[1:]:
+            ev = evalu(arg, env)
+            if not truthy(ev):
+                return ('bool', False)
+        if ev is None:
+            return ('bool', True)
+        else:
+            return ev
+    else:
+        # Normal function application:
+        return dispatch(car,
+                        env,
+                        [evalu(x, env) for x in l[1:]])
+
 def evalu(ast, env):
     k, v = ast
     if k == 'int' or k == 'float' or k == 'bool':
         return ast
     if k == 'atom':
-        if v in dispatch_table.keys():
-            return ('intproc', v)
-        elif v in env:
-            return env[v]
+        return eval_atom(v, env)
     if k == 'list':
-        # Empty list:
-        if not v:
-            return ('list', [])
-        # Special forms:
-        car = v[0]
-        if car == ('atom', 'quote'):
-            return v[1]
-        if car == ('atom', 'cond'):
-            clauses = v[1:]
-            for clause in clauses:
-                (maybe_list, clauselist) = clause
-                if maybe_list != 'list':
-                    raise Exception('Cond clause "%s" not a list!"' %
-                                    v[1:])
-                pred = clauselist[0]
-                if (pred == ('atom', 'else') or
-                    evalu(pred, env) != ('bool', False)):
-                    return evalu(clauselist[1], env)
-            return ('bool', True)
-        # FIXME: cond should macroexpand to if or vice-versa?
-        if car == ('atom', 'if'):
-            pred = v[1]
-            if truthy(evalu(pred, env)):
-                return evalu(v[2], env)
-            else:
-                return evalu(v[3], env)
-        elif car == ('atom', 'define'):
-            k1, v1 = v[1]
-            if k1 == 'atom':
-                env[v1] = evalu(v[2], env)
-                return ('nop', None)
-            elif k1 == 'list':
-                fn_name, args = v1[0], v1[1:]
-                lambd = ('list', [
-                    ('atom', 'lambda'),
-                    ('list', args),
-                    v[2:]])
-                env[v1[0]] = lambd
-                return ('nop', None)
-            else:
-                raise Exception("Don't know how to bind '%s'!" % k1)
-        elif car == ('atom', 'or'):
-            for arg in v[1:]:
-                ev = evalu(arg, env)
-                if truthy(ev):
-                    return ev
-            return ('bool', False)
-        elif car == ('atom', 'and'):
-            ev = None
-            for arg in v[1:]:
-                ev = evalu(arg, env)
-                if not truthy(ev):
-                    return ('bool', False)
-            if ev is None:
-                return ('bool', True)
-            else:
-                return ev
-        else:
-            # Normal function application:
-            return dispatch(car,
-                            env,
-                            [evalu(x, env) for x in v[1:]])
+        return eval_list(v, env)
     raise Exception('evaluation error: "%s"' % str(ast))
 
 def printable_value(ast):

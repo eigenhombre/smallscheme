@@ -244,9 +244,13 @@ def test_define_function():
     t("(a)", "3")
     e("""(define (a) 1 666)""")
     t("(a)", "666")
-    # TODO:
     e("""(define (a)
-           (define (b) 3)
+           (define b 3)
            b)""")
-    # t("(a)", "3")
+    t("(a)", "3")
+    e("""(define (a)
+           (define (f) 4)
+           (f))""")
+    t("(a)", "4")
+
     # t("((lambda (x) 3) 1)", "3")
