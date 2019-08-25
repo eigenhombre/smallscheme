@@ -140,7 +140,7 @@ def dispatch(fn_atom, env, args):
         (maybe_list,
          ((maybe_atom, maybe_lambda),
           (maybe_list, arg_names),
-          rest)) = binding
+          body)) = binding
         if (maybe_list != 'list' or
             maybe_atom != 'atom' or
             maybe_lambda != 'lambda'):
@@ -149,7 +149,12 @@ def dispatch(fn_atom, env, args):
         new_env = env.copy()
         for i, x in enumerate(arg_names):
             new_env[x[1]] = args[i]
-        return evalu(rest, new_env)
+        ret = None
+        for form in body:
+            # FIXME: each form can change the environment; need to
+            # reflect that.
+            ret = evalu(form, new_env)
+        return ret  # Last result is returned
     raise Exception('Unknown function name: "%s"'
                     % fn_name)
 
@@ -202,7 +207,7 @@ def evalu(ast, env):
                 lambd = ('list', [
                     ('atom', 'lambda'),
                     ('list', args),
-                    v[2]])
+                    v[2:]])
                 env[v1[0]] = lambd
                 return ('nop', None)
             else:
