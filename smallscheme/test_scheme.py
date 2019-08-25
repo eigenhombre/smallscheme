@@ -233,7 +233,6 @@ def test_define_function():
            (< (abs (- (square guess) x)) 0.001))""")
     e("""(define (sqrt x)
            (sqrt-iter 1.0 x))""")
-    e("(define (square x) (* x x))")
     # These may or may not pass; they do on my
     # Macbook Pro:
     # t("(sqrt 9)", "3.0")
@@ -253,4 +252,10 @@ def test_define_function():
            (f))""")
     t("(a)", "4")
 
+    t("+", "Internal procedure '+'")
+    e("(define round square)")
+    t("(round 5)", "25")
+
+    # YAH:
+    # t("square", "123") <-- some printable representation
     # t("((lambda (x) 3) 1)", "3")

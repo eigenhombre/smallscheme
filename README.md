@@ -62,6 +62,7 @@ Use `rlwrap` if you want history and that sort of thing:
     scheme> ^D
     $
 
+See `smallscheme/test_scheme.py` for many more examples.
 
 Done
 ----

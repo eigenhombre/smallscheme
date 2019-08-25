@@ -130,13 +130,16 @@ dispatch_table = {'+': plus,
                   'car': car,
                   'cdr': cdr}
 
-def dispatch(fn_atom, env, args):
-    _, fn_name = fn_atom
+def intern(env, atom_name, item):
+    assert type(atom_name) is str
+    env[atom_name] = item
+
+def dispatch(fn_name, env, args):
     fn = dispatch_table.get(fn_name, None)
     if fn is not None:
         return fn(args)
-    if fn_atom in env:
-        binding = env[fn_atom]
+    if fn_name in env:
+        binding = env[fn_name]
         (maybe_list,
          ((maybe_atom, maybe_lambda),
           (maybe_list, arg_names),
@@ -148,7 +151,7 @@ def dispatch(fn_atom, env, args):
                             % binding)
         new_env = env.copy()
         for i, x in enumerate(arg_names):
-            new_env[x[1]] = args[i]
+            intern(new_env, x[1], args[i])
         ret = None
         for form in body:
             ret = evalu(form, new_env)
@@ -195,20 +198,20 @@ def eval_list(l, env):
         else:
             return evalu(l[3], env)
     elif car == ('atom', 'define'):
-        k1, v1 = l[1]
-        if k1 == 'atom':
-            env[v1] = evalu(l[2], env)
+        typ, val = l[1]
+        if typ == 'atom':
+            intern(env, val, evalu(l[2], env))
             return ('nop', None)
-        elif k1 == 'list':
-            fn_name, args = v1[0], v1[1:]
+        elif typ == 'list':
+            fn_name, args = val[0], val[1:]
             lambd = ('list', [
                 ('atom', 'lambda'),
                 ('list', args),
                 l[2:]])
-            env[v1[0]] = lambd
+            intern(env, val[0][1], lambd)
             return ('nop', None)
         else:
-            raise Exception("Don't know how to bind '%s'!" % k1)
+            raise Exception("Don't know how to bind '%s'!" % typ)
     elif car == ('atom', 'or'):
         for arg in l[1:]:
             ev = evalu(arg, env)
@@ -227,7 +230,7 @@ def eval_list(l, env):
             return ev
     else:
         # Normal function application:
-        return dispatch(car,
+        return dispatch(car[1],
                         env,
                         [evalu(x, env) for x in l[1:]])
 
