@@ -211,14 +211,14 @@ def test_define_function():
     t("(abs 10)", "10")
     t("(abs -10)", "10")
 
-    e("""(define (fact n)
-           (if (< n 2)
-               n
-               (* n (fact (- n 1)))))""")
-    t("(fact 1)", "1")
-    t("(fact 2)", "2")
-    t("(fact 3)", "6")
-    t("(fact 10)", "3628800")
+    e("""(define (factorial n)
+           (if (= n 1)
+               1
+               (* n (factorial (- n 1)))))""")
+    t("(factorial 1)", "1")
+    t("(factorial 2)", "2")
+    t("(factorial 3)", "6")
+    t("(factorial 10)", "3628800")
 
     # P. 23-24:
     e("""(define (sqrt-iter guess x)
@@ -257,5 +257,25 @@ def test_define_function():
     e("(define round square)")
     t("(round 5)", "25")
 
+    # p. 30
+    e("""(define (sqrt x)
+           (define (good-enough? guess)
+             (< (abs (- (square guess) x)) 0.001))
+           (define (improve guess)
+             (average guess (/ x guess)))
+           (define (sqrt-iter guess)
+             (if (good-enough? guess)
+               guess
+               (sqrt-iter (improve guess))))
+           (sqrt-iter 1.0))""")
+    t("(sqrt 9)", "3.0")
+
+    # p. 37
+    e("""(define (fib n)
+           (cond ((= n 0) 0)
+                 ((= n 1) 1)
+                 (else (+ (fib (- n 1))
+                          (fib (- n 2))))))""")
+    t("(fib 5)", "5")
     # TODO:
     # t("((lambda (x) 3) 1)", "3")
