@@ -266,7 +266,7 @@ def printable_value(ast):
     if k == 'nop':
         return ''
     if k == 'fn':
-        (fn_name, *_) = v
+        (fn_name, _, _) = v
         if fn_name == 'lambda':
             return "Anonymous-function"
         return "Function-'%s'" % str(fn_name)
