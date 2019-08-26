@@ -178,6 +178,7 @@ def test_define_function():
             s1), env)), s2)
 
     e("(define (square x) (* x x))")
+    t("square", "Function 'square'")
     e("(define (f x y) (+ x y))")
     e("(define z 33)")
     t("(square 21)", "441")
@@ -256,6 +257,5 @@ def test_define_function():
     e("(define round square)")
     t("(round 5)", "25")
 
-    # YAH:
-    # t("square", "123") <-- some printable representation
+    # TODO:
     # t("((lambda (x) 3) 1)", "3")

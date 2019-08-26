@@ -139,16 +139,10 @@ def dispatch(fn_name, env, args):
     if fn is not None:
         return fn(args)
     if fn_name in env:
-        binding = env[fn_name]
-        (maybe_list,
-         ((maybe_atom, maybe_lambda),
-          (maybe_list, arg_names),
-          body)) = binding
-        if (maybe_list != 'list' or
-            maybe_atom != 'atom' or
-            maybe_lambda != 'lambda'):
+        (maybe_fn, (fn_name, arg_names, body)) = env[fn_name]
+        if maybe_fn != 'fn':
             raise Exception('Malformed function definition "%s"!'
-                            % binding)
+                            % env[fn_name])
         new_env = env.copy()
         for i, x in enumerate(arg_names):
             intern(new_env, x[1], args[i])
@@ -203,11 +197,8 @@ def eval_list(l, env):
             intern(env, val, evalu(l[2], env))
             return ('nop', None)
         elif typ == 'list':
-            fn_name, args = val[0], val[1:]
-            lambd = ('list', [
-                ('atom', 'lambda'),
-                ('list', args),
-                l[2:]])
+            (_, fn_name), args = val[0], val[1:]
+            lambd = ('fn', (fn_name, args, l[2:]))
             intern(env, val[0][1], lambd)
             return ('nop', None)
         else:
@@ -260,6 +251,9 @@ def printable_value(ast):
                                 for x in v]) + ')'
     if k == 'nop':
         return ''
+    if k == 'fn':
+        (fn_name, *_) = v
+        return "Function '%s'" % str(fn_name)
     raise Exception('Unprintable ast "%s"' % str(ast))
 
 def repl():
