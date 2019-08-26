@@ -119,6 +119,13 @@ def cdr(x):
                         % x)
     return ('list', l[1:])
 
+def cons(args):
+    # 2-ary cons for now:
+    (a, (type_l, l)) = args
+    if type_l != 'list':
+        raise Exception("Invalid cons args, '%s'!" % str(args))
+    return ('list', [a] + l)
+
 dispatch_table = {'+': plus,
                   '*': times,
                   '-': minus,
@@ -128,30 +135,25 @@ dispatch_table = {'+': plus,
                   '>': greaterthan,
                   'not': notnot,
                   'car': car,
-                  'cdr': cdr}
+                  'cdr': cdr,
+                  'cons': cons}
 
 def intern(env, atom_name, item):
     assert type(atom_name) is str
     env[atom_name] = item
 
-def dispatch(fn_name, env, args):
-    fn = dispatch_table.get(fn_name, None)
-    if fn is not None:
-        return fn(args)
-    if fn_name in env:
-        (maybe_fn, (fn_name, arg_names, body)) = env[fn_name]
-        if maybe_fn != 'fn':
-            raise Exception('Malformed function definition "%s"!'
-                            % env[fn_name])
-        new_env = env.copy()
-        for i, x in enumerate(arg_names):
-            intern(new_env, x[1], args[i])
-        ret = None
-        for form in body:
-            ret = evalu(form, new_env)
-        return ret  # Last result is returned
-    raise Exception('Unknown function name: "%s"'
-                    % fn_name)
+def apply(fn_form, args, env):
+    (maybe_fn, (fn_name, arg_names, body)) = fn_form
+    if maybe_fn != 'fn':
+        raise Exception('Malformed function definition "%s"!'
+                        % env[fn_name])
+    new_env = env.copy()
+    for i, x in enumerate(arg_names):
+        intern(new_env, x[1], args[i])
+    ret = None
+    for form in body:
+        ret = evalu(form, new_env)
+    return ret  # Last result is returned
 
 def truthy(x):
     return x != ('bool', False)
@@ -169,10 +171,10 @@ def eval_list(l, env):
     if not l:
         return ('list', [])
     # Special forms:
-    car = l[0]
-    if car == ('atom', 'quote'):
+    t, cname = l[0]
+    if cname == 'quote':
         return l[1]
-    if car == ('atom', 'cond'):
+    elif cname == 'cond':
         clauses = l[1:]
         for clause in clauses:
             (maybe_list, clauselist) = clause
@@ -185,13 +187,13 @@ def eval_list(l, env):
                 return evalu(clauselist[1], env)
         return ('bool', True)
     # FIXME: cond should macroexpand to if or vice-versa?
-    if car == ('atom', 'if'):
+    elif cname == 'if':
         pred = l[1]
         if truthy(evalu(pred, env)):
             return evalu(l[2], env)
         else:
             return evalu(l[3], env)
-    elif car == ('atom', 'define'):
+    elif cname == 'define':
         typ, val = l[1]
         if typ == 'atom':
             intern(env, val, evalu(l[2], env))
@@ -199,17 +201,22 @@ def eval_list(l, env):
         elif typ == 'list':
             (_, fn_name), args = val[0], val[1:]
             lambd = ('fn', (fn_name, args, l[2:]))
-            intern(env, val[0][1], lambd)
+            intern(env, fn_name, lambd)
             return ('nop', None)
         else:
             raise Exception("Don't know how to bind '%s'!" % typ)
-    elif car == ('atom', 'or'):
+    elif cname == 'lambda':
+        typ, val = l[1]
+        assert typ == 'list'
+        args = val[1:]
+        return ('fn', ('lambda', args, l[2:]))
+    elif cname == 'or':
         for arg in l[1:]:
             ev = evalu(arg, env)
             if truthy(ev):
                 return ev
         return ('bool', False)
-    elif car == ('atom', 'and'):
+    elif cname == 'and':
         ev = None
         for arg in l[1:]:
             ev = evalu(arg, env)
@@ -221,9 +228,16 @@ def eval_list(l, env):
             return ev
     else:
         # Normal function application:
-        return dispatch(car[1],
-                        env,
-                        [evalu(x, env) for x in l[1:]])
+        args_evaled = [evalu(x, env) for x in l[1:]]
+        # Internally-supplied functions:
+        fn = dispatch_table.get(cname, None)
+        if fn:
+            return fn(args_evaled)
+        # User-defined functions:
+        if cname in env:
+            return apply(env[cname], args_evaled, env)
+        raise Exception('Unknown function name: "%s"'
+                        % cname)
 
 def evalu(ast, env):
     k, v = ast
@@ -253,7 +267,9 @@ def printable_value(ast):
         return ''
     if k == 'fn':
         (fn_name, *_) = v
-        return "Function '%s'" % str(fn_name)
+        if fn_name == 'lambda':
+            return "Anonymous-function"
+        return "Function-'%s'" % str(fn_name)
     raise Exception('Unprintable ast "%s"' % str(ast))
 
 def repl():

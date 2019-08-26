@@ -178,7 +178,7 @@ def test_define_function():
             s1), env)), s2)
 
     e("(define (square x) (* x x))")
-    t("square", "Function 'square'")
+    t("square", "Function-'square'")
     e("(define (f x y) (+ x y))")
     e("(define z 33)")
     t("(square 21)", "441")
@@ -277,5 +277,17 @@ def test_define_function():
                  (else (+ (fib (- n 1))
                           (fib (- n 2))))))""")
     t("(fib 5)", "5")
+
+    # empty list and cons
+    t("(quote ())", "()")
+    t("(cons 3 (quote ()))", "(3)")
+    t("(cons (quote a) (quote ()))", "(a)")
+    t("(cons (quote b) (quote (1 2 3)))", "(b 1 2 3)")
+
+    # higher-order functions
+    e("(define fn-list (cons square (quote ())))")
+    #t("((car fn-list) 3)", "9")
+
     # TODO:
-    # t("((lambda (x) 3) 1)", "3")
+    #t("(lambda (x) 3)", "Anonymous function")
+    #t("((lambda (x) 3) 1)", "3")
