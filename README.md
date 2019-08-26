@@ -73,12 +73,10 @@ Done
    1. `if` / `cond`
    1. `define`
    1. `or` / `and`
-1. Functions `+ - / * = < > not`
+1. Functions `+ - / * = < > not car cdr cons`
+1. Local (block or function level defines)
 
 Next steps
 -----
-1. Local (block or function level defines)
-1. `lambda`
-1. Higher order functions
+1. `lambda` application and higher order functions
 1. Add program file evaluation (e.g., `scheme.py myprog.scm`)
-1. Keep following along in SICP and adding functionality
