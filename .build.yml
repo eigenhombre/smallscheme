@@ -11,4 +11,5 @@ tasks:
 - nosetests: |
     cd smallscheme
     export PATH=$PATH:$HOME/.local/bin
+    python -V
     nosetests -vs
