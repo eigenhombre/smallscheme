@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/smallscheme
+    docker:
+      - image: circleci/python:3.6.4
+    steps:
+      - checkout
+      - run:
+          command: |
+            sudo pip install -r requirements.txt
+            pipenv install
