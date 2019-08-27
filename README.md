@@ -80,3 +80,4 @@ Next steps
 -----
 1. `lambda` application and higher order functions
 1. Add program file evaluation (e.g., `scheme.py myprog.scm`)
+1. PEP-8 auto lint
