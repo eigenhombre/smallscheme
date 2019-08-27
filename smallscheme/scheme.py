@@ -139,7 +139,6 @@ dispatch_table = {'+': plus,
                   'cons': cons}
 
 def intern(env, atom_name, item):
-    assert type(atom_name) is str
     env[atom_name] = item
 
 def apply(fn_form, args, env):
