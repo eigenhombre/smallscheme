@@ -3,11 +3,12 @@ sources:
 - https://git.sr.ht/~eigenhombre/smallscheme
 tasks:
 - installpip: |
-    sudo apt-get -qq install python-pip
+    sudo apt-get -qq upgrade
+    sudo apt-get -qq install python3-pip
 - pythondeps: |
     cd smallscheme
     export PATH=$PATH:$HOME/.local/bin
-    pip install -q -r requirements.txt
+    pip3 install -q -r requirements.txt
 - nosetests: |
     cd smallscheme
     export PATH=$PATH:$HOME/.local/bin
