@@ -261,7 +261,7 @@ def printable_value(ast):
         return v
     if k == 'list':
         return '(' + ' '.join([printable_value(x)
-                                for x in v]) + ')'
+                               for x in v]) + ')'
     if k == 'nop':
         return ''
     if k == 'fn':

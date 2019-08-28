@@ -68,8 +68,9 @@ def test_evalu():
                           ('atom', 'b'),
                           ('atom', 'c')])]),
       ('list', [('atom', 'a'),
-                          ('atom', 'b'),
-                          ('atom', 'c')]))
+                ('atom', 'b'),
+                ('atom', 'c')]))
+
 
 def test_printable_value():
     def t(a, b):
@@ -286,8 +287,8 @@ def test_define_function():
 
     # higher-order functions
     e("(define fn-list (cons square (quote ())))")
-    #t("((car fn-list) 3)", "9")
+    # t("((car fn-list) 3)", "9")
 
     # TODO:
-    #t("(lambda (x) 3)", "Anonymous function")
-    #t("((lambda (x) 3) 1)", "3")
+    # t("(lambda (x) 3)", "Anonymous function")
+    # t("((lambda (x) 3) 1)", "3")
