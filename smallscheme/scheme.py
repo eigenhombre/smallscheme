@@ -2,6 +2,7 @@
 
 import lark
 import operator
+import random
 import re
 from functools import reduce
 
@@ -47,6 +48,23 @@ def parse_str(x):
     # A bit of a hack, maybe handle newlines directly in parser:
     return convert_ast(parser.parse(x.replace("\n", " ")))
 
+def atom(x):
+    return 'atom', x
+
+def list_(x):
+    return 'list', x
+
+def bool_(x):
+    return 'bool', x
+
+def int_(x):
+    return 'int', x
+
+def typ(x):
+    return x[0]
+
+noop = 'nop', None
+
 def argstype(args):
     # FIXME: Unit test for argument types
     arglist = [x for (x, _) in args]
@@ -83,7 +101,7 @@ def divide(args):
                                  1))
 
 def equals(args):
-    return ('bool', operator.eq(*args))
+    return bool_(operator.eq(*args))
 
 def compare(args, oper):
     ((ty1, v1), (ty2, v2)) = args[:2]
@@ -91,7 +109,7 @@ def compare(args, oper):
         (ty2 != 'int' and ty2 != 'float')):
         raise Exception("Type error, can't compare '%s' to '%s'!" %
                         (ty1, ty2))
-    return ('bool', oper(v1, v2))
+    return bool_(oper(v1, v2))
 
 def lessthan(args):
     return compare(args, operator.lt)
@@ -100,10 +118,10 @@ def greaterthan(args):
     return compare(args, operator.gt)
 
 def notnot(args):
-    if args[0] == ('bool', False):
-        return ('bool', True)
+    if args[0] == bool_(False):
+        return bool_(True)
     else:
-        return ('bool', False)
+        return bool_(False)
 
 def car(x):
     typ, l = x[0]
@@ -117,14 +135,28 @@ def cdr(x):
     if typ != 'list':
         raise Exception("Can't take car of '%s'!"
                         % x)
-    return ('list', l[1:])
+    return list_(l[1:])
 
 def cons(args):
     # 2-ary cons for now:
     (a, (type_l, l)) = args
     if type_l != 'list':
         raise Exception("Invalid cons args, '%s'!" % str(args))
-    return ('list', [a] + l)
+    return list_([a] + l)
+
+def remainder(args):
+    ((t1, v1), (t2, v2)) = args
+    if t1 != 'int':
+        raise Exception("Invalid arg type, '%s'!" % t1)
+    if t2 != 'int':
+        raise Exception("Invalid arg type, '%s'!" % t2)
+    return int_(v1 % v2)
+
+def randint(arg):
+    t, v = arg[0]
+    if t != 'int':
+        raise Exception("Invalid arg type, '%s'!" % t)
+    return int_(random.randint(0, v - 1))
 
 dispatch_table = {'+': plus,
                   '*': times,
@@ -136,6 +168,8 @@ dispatch_table = {'+': plus,
                   'not': notnot,
                   'car': car,
                   'cdr': cdr,
+                  'remainder': remainder,
+                  'random': randint,
                   'cons': cons}
 
 def intern(env, atom_name, item):
@@ -168,12 +202,12 @@ def eval_atom(atom_name, env):
 def eval_list(l, env):
     # Empty list:
     if not l:
-        return ('list', [])
+        return list_([])
+    car = l[0]
     # Special forms:
-    t, cname = l[0]
-    if cname == 'quote':
+    if car == atom('quote'):
         return l[1]
-    elif cname == 'cond':
+    elif car == atom('cond'):
         clauses = l[1:]
         for clause in clauses:
             (maybe_list, clauselist) = clause
@@ -182,61 +216,66 @@ def eval_list(l, env):
                                 l[1:])
             pred = clauselist[0]
             if (pred == ('atom', 'else') or
-                evalu(pred, env) != ('bool', False)):
+                evalu(pred, env) != bool_(False)):
                 return evalu(clauselist[1], env)
-        return ('bool', True)
+        return bool_(True)
     # FIXME: cond should macroexpand to if or vice-versa?
-    elif cname == 'if':
+    elif car == atom('if'):
         pred = l[1]
         if truthy(evalu(pred, env)):
             return evalu(l[2], env)
         else:
             return evalu(l[3], env)
-    elif cname == 'define':
+    elif car == atom('define'):
         typ, val = l[1]
         if typ == 'atom':
             intern(env, val, evalu(l[2], env))
-            return ('nop', None)
+            return noop
         elif typ == 'list':
             (_, fn_name), args = val[0], val[1:]
             lambd = ('fn', (fn_name, args, l[2:]))
             intern(env, fn_name, lambd)
-            return ('nop', None)
+            return noop
         else:
             raise Exception("Don't know how to bind '%s'!" % typ)
-    elif cname == 'lambda':
+    elif car == atom('lambda'):
         typ, val = l[1]
         assert typ == 'list'
         args = val[1:]
         return ('fn', ('lambda', args, l[2:]))
-    elif cname == 'or':
+    elif car == atom('or'):
         for arg in l[1:]:
             ev = evalu(arg, env)
             if truthy(ev):
                 return ev
-        return ('bool', False)
-    elif cname == 'and':
+        return bool_(False)
+    elif car == atom('and'):
         ev = None
         for arg in l[1:]:
             ev = evalu(arg, env)
             if not truthy(ev):
-                return ('bool', False)
+                return bool_(False)
         if ev is None:
-            return ('bool', True)
+            return bool_(True)
         else:
             return ev
     else:
         # Normal function application:
         args_evaled = [evalu(x, env) for x in l[1:]]
+        # HOF:
+        cartype, carval = car
+        if cartype == 'list':
+            hof = evalu(l[0], env)
+            return apply(hof, args_evaled, env)
         # Internally-supplied functions:
-        fn = dispatch_table.get(cname, None)
+        fn = dispatch_table.get(carval, None)
         if fn:
             return fn(args_evaled)
         # User-defined functions:
-        if cname in env:
-            return apply(env[cname], args_evaled, env)
+        if carval in env:
+            return apply(env[carval], args_evaled, env)
         raise Exception('Unknown function name: "%s"'
-                        % cname)
+                        % carval)
 
 def evalu(ast, env):
     k, v = ast

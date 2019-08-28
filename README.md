@@ -6,7 +6,7 @@ smallscheme
 A tiny scheme written in Python to prepare for
 [this class](https://www.dabeaz.com/sicp.html).
 
-Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up through page **39**.
+Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up to page **54**.
 
 Setup
 -----
@@ -46,5 +46,6 @@ Done
 
 Next steps
 -----
-1. `lambda` application and higher order functions
+1. `display`, `runtime` and `newline` functions
 1. Add program file evaluation (e.g., `scheme.py myprog.scm`)
+1. Python interop?

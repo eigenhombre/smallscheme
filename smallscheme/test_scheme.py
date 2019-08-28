@@ -170,6 +170,12 @@ def test_multiple_defines():
     t("(cdr (quote (1 2 3)))", "(2 3)")
     t("(cdr (quote (a b c)))", "(b c)")
 
+def test_random():
+    for _ in xrange(50):
+        t, v = evalu(parse_str("(random 10)"), {})
+        assert t == 'int'
+        assert 0 <= v < 10
+
 def test_define_function():
     env = {}
     def e(s):
@@ -285,10 +291,13 @@ def test_define_function():
     t("(cons (quote a) (quote ()))", "(a)")
     t("(cons (quote b) (quote (1 2 3)))", "(b 1 2 3)")
 
-    # higher-order functions
+    # lambdas and higher-order functions
     e("(define fn-list (cons square (quote ())))")
-    # t("((car fn-list) 3)", "9")
+    t("((car fn-list) 3)", "9")
 
-    # TODO:
-    # t("(lambda (x) 3)", "Anonymous function")
-    # t("((lambda (x) 3) 1)", "3")
+    t("(lambda (x) 3)", "Anonymous-function")
+    t("((lambda (x) 3) 1)", "3")
+    t("((lambda (x) 6) 1 2 3)", "6")
+
+    # p. 45
+    t("(remainder 10 3)", "1")
