@@ -3,10 +3,12 @@ smallscheme
 
 [![builds.sr.ht status](https://builds.sr.ht/~eigenhombre/smallscheme.svg)](https://builds.sr.ht/~eigenhombre/smallscheme?)
 
-A tiny scheme written in Python to prepare for
-[this class](https://www.dabeaz.com/sicp.html).
+A tiny (< 400 lines) Scheme written in Python to prepare for [this
+class](https://www.dabeaz.com/sicp.html).
 
-Currently, this Scheme implements everything needed to follow along in [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs) up to page **54**.
+Currently, this Scheme implements everything needed to follow along in
+[SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
+up to page **54**.
 
 Setup
 -----

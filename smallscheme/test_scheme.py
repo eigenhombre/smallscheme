@@ -171,7 +171,7 @@ def test_multiple_defines():
     t("(cdr (quote (a b c)))", "(b c)")
 
 def test_random():
-    for _ in xrange(50):
+    for _ in range(50):
         t, v = evalu(parse_str("(random 10)"), {})
         assert t == 'int'
         assert 0 <= v < 10
