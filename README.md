@@ -36,12 +36,8 @@ Done
 ----
 1. Lexing and parsing of atoms and s-expressions
 1. Read-Eval-Print
-1. Special forms
-   1. `quote`
-   1. `if` / `cond`
-   1. `define`
-   1. `or` / `and`
-1. Functions `+ - / * = < > not car cdr cons`
+1. Special forms `quote if cond define or and lambda`
+1. Functions `+ - / * = < > not car cdr cons remainder random`
 1. Local (block or function level defines)
 
 Next steps
