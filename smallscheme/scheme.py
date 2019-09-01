@@ -4,49 +4,30 @@ import lark
 import operator
 import random
 import re
+import sys
 from functools import reduce
 
 parser = lark.Lark(
     '''
-start       : _expr
-_exprs      : ( _expr _whitespace )* _expr
-_expr       : ATOM
-            | _num
-            | BOOL
-            | list
-TRUE        : "#t"
-FALSE       : "#f"
-BOOL        : TRUE | FALSE
-list        : "(" _exprs? ")"
-ATOM        : /[a-zA-Z]+[a-zA-Z0-9\-\?]*/
-            | /[\+\*\/\-\=\>\<]/
-INT         : /[-+]?[0-9]+/
-FLOAT       : /[-+]?[0-9]+\.[0-9]*/
-_num        : INT | FLOAT
-_whitespace : (" " | /\t/ )+
+start  : _exprs
+_exprs : _e* _e
+_e     : ATOM
+       | _num
+       | BOOL
+       | list
+TRUE   : "#t"
+FALSE  : "#f"
+BOOL   : TRUE | FALSE
+list   : "(" _exprs? ")"
+INT    : /[-+]?[0-9]+/
+ATOM   : /[a-zA-Z]+[a-zA-Z0-9\-\?]*/
+       | /[\*\/\=\>\<]/
+       | /[\-\+](?![0-9])/
+FLOAT  : /[-+]?[0-9]+\.[0-9]*/
+_num   : INT | FLOAT
+%import common.WS
+%ignore WS
     ''')
-
-def convert_ast(ast):
-    if type(ast) is lark.tree.Tree:
-        if ast.data == "start":
-            return convert_ast(ast.children[0])
-        if ast.data == "list":
-            return ('list', [convert_ast(x) for x in ast.children])
-    if type(ast) is lark.lexer.Token:
-        ty = ast.type.lower()
-        if ty == "int":
-            return (ty, int(ast.value))
-        if ty == "float":
-            return (ty, float(ast.value))
-        elif ty == "bool":
-            return (ty, True if ast.value == "#t" else False)
-        else:
-            return (ast.type.lower(), ast.value)
-    raise Exception("Unparsed AST: '%s'" % ast)
-
-def parse_str(x):
-    # A bit of a hack, maybe handle newlines directly in parser:
-    return convert_ast(parser.parse(x.replace("\n", " ")))
 
 def atom(x):
     return 'atom', x
@@ -60,10 +41,43 @@ def bool_(x):
 def int_(x):
     return 'int', x
 
+def float_(x):
+    return 'float', x
+
 def typ(x):
     return x[0]
 
 noop = 'nop', None
+
+def convert_ast(ast):
+    """
+    Re-cast the Lark representation of the parse tree into our own.
+
+    'start' is always the top of the tree and `convert_ast` returns a
+    list of zero or more parsed expressions.
+
+    All other entrypoints are recursively converted into the
+    appropriate atom, list, int, float etc.
+    """
+    if type(ast) is lark.tree.Tree:
+        if ast.data == "start":
+            return [convert_ast(x) for x in ast.children]
+        if ast.data == "list":
+            return list_([convert_ast(x) for x in ast.children])
+    if type(ast) is lark.lexer.Token:
+        ty = ast.type.lower()
+        if ty == "int":
+            return int_(int(ast.value))
+        if ty == "float":
+            return float_(float(ast.value))
+        elif ty == "bool":
+            return bool_(True if ast.value == "#t" else False)
+        elif ty == "atom":
+            return atom(ast.value)
+    raise Exception("Unparsed AST: '%s'" % ast)
+
+def parse_str(x):
+    return convert_ast(parser.parse(x))
 
 def argstype(args):
     # FIXME: Unit test for argument types
@@ -158,6 +172,10 @@ def randint(arg):
         raise Exception("Invalid arg type, '%s'!" % t)
     return int_(random.randint(0, v - 1))
 
+def display(arg):
+    print(printable_value(arg[0]))
+    return noop
+
 dispatch_table = {'+': plus,
                   '*': times,
                   '-': minus,
@@ -170,7 +188,8 @@ dispatch_table = {'+': plus,
                   'cdr': cdr,
                   'remainder': remainder,
                   'random': randint,
-                  'cons': cons}
+                  'cons': cons,
+                  'display': display}
 
 def intern(env, atom_name, item):
     env[atom_name] = item
@@ -310,21 +329,37 @@ def printable_value(ast):
         return "Function-'%s'" % str(fn_name)
     raise Exception('Unprintable ast "%s"' % str(ast))
 
+def inp():
+    if sys.version > (2,9):
+        return input("scheme> ")
+    else:
+        return raw_input("scheme> ")
+
 def repl():
     env = {}
     while True:
         try:
-            x = input("scheme> ").strip()
+            x = inp().strip()
         except EOFError:
             print()
             break
         if x:
             try:
-                pv = printable_value(evalu(parse_str(x), env))
-                if pv:
-                    print(pv)
+                for parsed in parse_str(x):
+                    pv = printable_value(evalu(parsed, env))
+                    if pv:
+                        print(pv)
             except Exception as e:
                 print(e)
 
+def run_file(filename):
+    env = {}
+    txt = file(filename).read()
+    for p in parse_str(txt):
+        evalu(p, env)
+
 if __name__ == "__main__":
-    repl()
+    if len(sys.argv) > 1:
+        run_file(sys.argv[1])
+    else:
+        repl()
