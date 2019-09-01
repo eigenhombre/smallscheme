@@ -330,7 +330,7 @@ def printable_value(ast):
     raise Exception('Unprintable ast "%s"' % str(ast))
 
 def inp():
-    if sys.version > (2,9):
+    if sys.version > (2, 9):
         return input("scheme> ")
     else:
         return raw_input("scheme> ")

@@ -62,15 +62,15 @@ def test_evalu():
     t(bool_(False), bool_(False))
     t(atom('+'), ('intproc', '+'))
     t(list_([atom('quote'),
-                int_(3)]),
+             int_(3)]),
       int_(3))
     t(list_([atom('quote'),
-                list_([atom('a'),
-                          atom('b'),
-                          atom('c')])]),
+             list_([atom('a'),
+                    atom('b'),
+                    atom('c')])]),
       list_([atom('a'),
-                atom('b'),
-                atom('c')]))
+             atom('b'),
+             atom('c')]))
 
 def tt(s1, env, *s2):
     ret = None
