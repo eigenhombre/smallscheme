@@ -34,6 +34,18 @@ Use `rlwrap` if you want history and that sort of thing:
 
 See `smallscheme/test_scheme.py` for many more examples.
 
+Making Programs
+---------------
+Example:
+
+    $  cat test.scm
+    (display (quote hello))
+    (display (quote world))
+    $  ./smallscheme/scheme.py test.scm
+    hello
+    world
+    $
+
 Done
 ----
 1. Lexing and parsing of atoms and s-expressions
@@ -41,9 +53,9 @@ Done
 1. Special forms `quote if cond define or and lambda`
 1. Functions `+ - / * = < > not car cdr cons remainder random`
 1. Local (block or function level defines)
+1. Program file evaluation (e.g., `scheme.py myprog.scm`)
 
 Next steps
 -----
-1. `display`, `runtime` and `newline` functions
-1. Add program file evaluation (e.g., `scheme.py myprog.scm`)
+1. `runtime` and `newline` functions
 1. Python interop?
