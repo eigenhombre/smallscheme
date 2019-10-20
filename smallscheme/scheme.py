@@ -330,7 +330,7 @@ def printable_value(ast):
     raise Exception('Unprintable ast "%s"' % str(ast))
 
 def inp():
-    if sys.version > (2, 9):
+    if sys.version_info > (2, 9):
         return input("scheme> ")
     else:
         return raw_input("scheme> ")
@@ -354,7 +354,8 @@ def repl():
 
 def run_file(filename):
     env = {}
-    txt = file(filename).read()
+    with open(filename) as f:
+        txt = f.read()
     for p in parse_str(txt):
         evalu(p, env)
 
