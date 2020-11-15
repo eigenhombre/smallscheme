@@ -2,8 +2,8 @@ image: ubuntu/lts
 sources:
 - https://git.sr.ht/~eigenhombre/smallscheme
 tasks:
-- installpip: |
-    sudo apt-get -qq install python-pip
+# - installpip: |
+#     sudo apt-get -qq install python-pip
 - nosetests: |
     cd smallscheme
     export PATH=$PATH:$HOME/.local/bin
