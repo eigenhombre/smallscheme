@@ -2,11 +2,11 @@ image: ubuntu/lts
 sources:
 - https://git.sr.ht/~eigenhombre/smallscheme
 tasks:
-# - installpip: |
-#     sudo apt-get -qq install python-pip
+- installpip: |
+    sudo apt-get -qq install python3-pip
 - nosetests: |
     cd smallscheme
     export PATH=$PATH:$HOME/.local/bin
-    pip install -q -r requirements.txt
+    pip3 install -q -r requirements.txt
     nosetests -vs
     pycodestyle .

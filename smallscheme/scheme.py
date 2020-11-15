@@ -199,6 +199,7 @@ def apply(fn_form, args, env):
     if maybe_fn != 'fn':
         raise Exception('Malformed function definition "%s"!'
                         % env[fn_name])
+    # THIS IS WRONG. If env changes....
     new_env = env.copy()
     for i, x in enumerate(arg_names):
         intern(new_env, x[1], args[i])
