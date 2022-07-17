@@ -36,6 +36,6 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip -r requirements.txt
       - name: Unit tests
-        run: nosetests -vs
+        run: pytest
       - name: Lint
         run: pycodestyle .
