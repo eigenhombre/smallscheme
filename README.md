@@ -1,7 +1,7 @@
 smallscheme
 ===========
 
-[![builds.sr.ht status](https://builds.sr.ht/~eigenhombre/smallscheme.svg)](https://builds.sr.ht/~eigenhombre/smallscheme?)
+![build](https://github.com/eigenhombre/smallscheme/actions/workflows/build.yml/badge.svg)
 
 A tiny (< 400 lines) Scheme written in Python to prepare for [this
 class](https://www.dabeaz.com/sicp.html).
