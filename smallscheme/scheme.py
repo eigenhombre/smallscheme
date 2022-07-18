@@ -360,8 +360,11 @@ def run_file(filename):
     for p in parse_str(txt):
         evalu(p, env)
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) > 1:
         run_file(sys.argv[1])
     else:
         repl()
+
+if __name__ == "__main__":
+    main()

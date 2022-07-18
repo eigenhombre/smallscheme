@@ -14,6 +14,11 @@ setup(
     keywords="lisp sicp scheme",
     url="https://github.com/eigenhombre/smallscheme",
     packages=['smallscheme'],
+    entry_points={
+        'console_scripts': [
+            'smallscheme = smallscheme.scheme:main',
+        ],
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Languages",
