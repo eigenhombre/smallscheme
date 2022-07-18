@@ -14,7 +14,6 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version:
-          - "3.5"
           - "3.6"
           - "3.7"
           - "3.8"
@@ -37,4 +36,4 @@ jobs:
       - name: Unit tests
         run: pytest
       - name: Lint
-        run: pycodestyle . --exclude=smallscheme/_version.py --exclude=versioneer.py
+        run: pycodestyle . --exclude=versioneer.py
