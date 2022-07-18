@@ -21,7 +21,6 @@ setup(
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
-        "Topic :: Languages",
         "License :: OSI Approved :: MIT License",
     ],
 )
