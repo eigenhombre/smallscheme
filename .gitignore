@@ -1,2 +1,6 @@
+*.egg-info/
+*.scm
 .python-version
 README.html
+build/
+dist/
