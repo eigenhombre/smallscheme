@@ -5,7 +5,7 @@ setup(
     name = "smallscheme",
     version = "0.0.1",
     author = "John Jacobsen",
-    author_email = "eigenhombre@gmail.com"
+    author_email = "eigenhombre@gmail.com",
     description = ("A small implementation of enough Scheme "
                    "to follow along in SICP"),
     license = "MIT",
