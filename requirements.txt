@@ -1,4 +1,4 @@
-conttest==0.0.8
-lark-parser==0.7.3
-pycodestyle==2.5.0
-pytest==7.1.0
+conttest == 0.0.8
+lark-parser == 0.7.3
+pycodestyle == 2.5.0
+pytest >= 7.1
