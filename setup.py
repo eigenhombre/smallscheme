@@ -7,7 +7,7 @@ setup(
     author="John Jacobsen",
     author_email="eigenhombre@gmail.com",
     description=("A small implementation of enough Scheme "
-                   "to follow along in SICP"),
+                 "to follow along in SICP"),
     license="MIT",
     keywords="lisp sicp scheme",
     url="https://github.com/eigenhombre/smallscheme",
