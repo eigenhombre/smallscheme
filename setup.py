@@ -1,9 +1,11 @@
 import os
 from setuptools import setup
+import versioneer
 
 setup(
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     name="smallscheme",
-    version="0.0.1",
     author="John Jacobsen",
     author_email="eigenhombre@gmail.com",
     description=("A small implementation of enough Scheme "
