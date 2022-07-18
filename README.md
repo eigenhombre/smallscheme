@@ -67,7 +67,7 @@ Next steps
 
 # License
 
-[MIT](https://github.com/eigenhombre/smallscheme/blob/master/LICENSE)
+[MIT](https://github.com/eigenhombre/smallscheme/blob/master/LICENSE.txt)
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
