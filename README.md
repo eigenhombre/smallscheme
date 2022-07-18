@@ -18,7 +18,7 @@ Setup
 Tests
 -----
 
-`nosetests`
+`pytest`
 
 REPL
 ----
