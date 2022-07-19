@@ -2,23 +2,26 @@
 
 all: deps test install
 
+venv:
+	virtualenv venv
+
 test:
-	pytest
+	. venv/bin/activate && pytest
 
 install:
-	python setup.py install
+	. venv/bin/activate && python setup.py install
 
 clean:
-	rm -rf *.egg-info dist .pytest_cache *.html
+	rm -rf *.egg-info dist .pytest_cache *.html venv
 
 pypi-test:
-	twine upload -r testpypi dist/*.tar.gz
+	. venv/bin/activate && twine upload -r testpypi dist/*.tar.gz
 
 deps:
-	pip install --upgrade pip
-	pip install -r requirements.txt
+	. venv/bin/activate && pip install --upgrade pip
+	. venv/bin/activate && pip install -r requirements.txt
 
 release:
 	./bumpver
-	python setup.py sdist
+	. venv/bin/activate && python setup.py sdist
 

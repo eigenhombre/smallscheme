@@ -4,6 +4,13 @@
 # see also https://github.com/unegma/bash-functions\
 #                 /blob/main/update.sh
 
+# make sure no uncommitted
+STATUS=$(git status --porcelain)
+if [[ -n "$STATUS" ]]; then
+   echo "Uncommitted code.  Not tagging a new version."
+   exit 1
+fi
+
 # get highest tag number
 VERSION=`git describe --abbrev=0 --tags`
 
