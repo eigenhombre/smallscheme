@@ -44,7 +44,7 @@ Example:
     (define f10 (fact 10))
 
     (display f10)
-    $  ./smallscheme/scheme.py test.scm
+    $  smallscheme test.scm
     3628800
     $
 
