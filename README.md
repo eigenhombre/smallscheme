@@ -48,6 +48,37 @@ Example:
     3628800
     $
 
+# Language
+
+Implemented so far:
+
+## Functions
+
+    *
+    +
+    -
+    /
+    <
+    =
+    >
+    car
+    cdr
+    cons
+    display
+    not
+    random
+    remainder
+
+## Special Forms
+
+    and
+    cond
+    define
+    if
+    lambda
+    or
+    quote
+
 # Local Development
 
 ## Setup
