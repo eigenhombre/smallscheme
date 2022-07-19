@@ -37,9 +37,3 @@ jobs:
         run: make venv
       - name: Make all the things
         run: make
-      # - name: Install dependencies
-      #   run: python -m pip install --upgrade pip -r requirements.txt
-      # - name: Unit tests
-      #   run: pytest
-      # - name: Lint
-      #   run: pycodestyle . --exclude=versioneer.py
