@@ -1,6 +1,8 @@
 smallscheme
 ===========
 
+<img src="/smallscheme.jpg" width="300">
+
 ![build](https://github.com/eigenhombre/smallscheme/actions/workflows/test.yml/badge.svg)
 
 A tiny (< 400 lines) Scheme written in Python to prepare for [this
