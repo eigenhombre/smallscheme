@@ -17,6 +17,9 @@ clean:
 pypi-test:
 	. venv/bin/activate && twine upload -r testpypi dist/*.tar.gz
 
+pypi:
+	. venv/bin/activate && twine upload -r smallscheme dist/*.tar.gz
+
 deps:
 	. venv/bin/activate && pip install --upgrade pip
 	. venv/bin/activate && pip install -r requirements.txt
