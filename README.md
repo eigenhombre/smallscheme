@@ -79,6 +79,11 @@ Implemented so far:
     or
     quote
 
+For explanation of these, and of Scheme in general, I recommend
+reading [Structure and Intepretation of Computer
+Programs](https://mitpress.mit.edu/sites/default/files/sicp/index.html),
+in print or (free!) online.
+
 # Local Development
 
 ## Setup
