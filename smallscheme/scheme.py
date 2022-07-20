@@ -176,7 +176,7 @@ def display(arg):
 
 def is_assert(arg):
     t, v = arg[0]
-    if v == False:
+    if v is False:
         raise AssertionError(f"is / assert failed: {arg}")
     return noop
 
