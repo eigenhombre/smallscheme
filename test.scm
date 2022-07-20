@@ -4,7 +4,7 @@
       n
       (* n (fact (- n 1)))))
 
-(define f10 (fact 10))
+(define f100 (fact 100))
 
-(display f10)
+(display f100)
 

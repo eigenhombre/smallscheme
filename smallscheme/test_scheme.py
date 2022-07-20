@@ -147,7 +147,8 @@ def test_compound_expressions_with_env():
     def cases(*cases):
         env = {}
         # Functions used a lot, we'll add to "global" state:
-        setup_cases = ["(define (square x) (* x x))"]
+        setup_cases = ["(define (square x) (* x x))",
+                       "(define (abs x) (if (< x 0) (- x) x))"]
         for s1 in setup_cases:
             single_eval_check(s1, "", env)
 
@@ -168,119 +169,107 @@ def test_compound_expressions_with_env():
                  (+ (square x) (square y)))"""),
           c("(sum-of-squares 3 4)", "25"),
           c("(define (f a) (sum-of-squares (+ a 1) (* a 2)))"),
-          c("(f 5)", "136"))
+          c("(f 5)", "136"),
+          c("(define round square)"),
+          c("(round 5)", "25"))
+
     cases(c("(define (f x y) (+ x y))"))
     cases(c("(define z 33)"))
-
-# FIXME: Migrate to test_compound_expressions_with_env:
-def test_compound_expressions():
-    env = {}
-    def t(s1, *s2):
-        multiple_eval_check(s1, env, *s2)
-
-    t("(define (square x) (* x x))")
-    t("""(define (abs x)
-           (cond ((> x 0) x)
-                 ((= x 0) 0)
-                 ((< x 0) (- x))))
-         (abs 10)""",
-      "10")
-    t("(abs -10)", "10")
-
-    t("""(define (abs x)
-           (cond ((< x 0) (- x))
-                 (else x)))""")
-    t("(abs 10)", "10")
-    t("(abs -10)", "10")
-
-    t("""(define (abs x)
-           (if (< x 0)
-               (- x)
-               x))""")
-    t("(abs 10)", "10")
-    t("(abs -10)", "10")
-
-    t("""(define (factorial n)
-           (if (= n 1)
-               1
-               (* n (factorial (- n 1)))))""")
-    t("(factorial 1)", "1")
-    t("(factorial 2)", "2")
-    t("(factorial 3)", "6")
-    t("(factorial 10)", "3628800")
-    t("(factorial 20)", "2432902008176640000")
-
+    cases(c("""(define (abs x)
+                 (cond ((> x 0) x)
+                       ((= x 0) 0)
+                       ((< x 0) (- x))))"""),
+          c("(abs 10)", "10"),
+          c("(abs -10)", "10"))
+    cases(c("""(define (abs x)
+                 (cond ((< x 0) (- x))
+                       (else x)))"""),
+          c("(abs 10)", "10"),
+          c("(abs -10)", "10"))
+    cases(c("""(define (abs x)
+                 (if (< x 0)
+                   (- x)
+                   x))"""),
+          c("(abs 10)", "10"),
+          c("(abs -10)", "10"))
+    cases(c("""(define (factorial n)
+                 (if (= n 1)
+                     1
+                     (* n (factorial (- n 1)))))"""),
+          c("(factorial 1)", "1"),
+          c("(factorial 2)", "2"),
+          c("(factorial 3)", "6"),
+          c("(factorial 10)", "3628800"),
+          c("(factorial 20)", "2432902008176640000"))
     # P. 23-24:
-    t("""(define (sqrt-iter guess x)
-           (if (good-enough? guess x)
-               guess
-               (sqrt-iter (improve guess x)
-                          x)))""")
-    t("""(define (improve guess x)
-           (average guess (/ x guess)))""")
-    t("""(define (average x y)
-           (/ (+ x y) 2))""")
-    t("""(define (good-enough? guess x)
-           (< (abs (- (square guess) x)) 0.001))""")
-    t("""(define (sqrt x)
-           (sqrt-iter 1.0 x))""")
-    # These may or may not pass; they do on my
-    # Macbook Pro:
-    # t("(sqrt 9)", "3.0")
-    # t("(square (sqrt 100))", "100.0")
-    t("""(define (a) 3)""")
-    t("(a)", "3")
-    t("""(define (a) (+ 1 2))""")
-    t("(a)", "3")
-    t("""(define (a) 1 666)""")
-    t("(a)", "666")
-    t("""(define (a)
-           (define b 3)
-           b)""")
-    t("(a)", "3")
-    t("""(define (a)
-           (define (f) 4)
-           (f))""")
-    t("(a)", "4")
+    cases(c("""(define (sqrt-iter guess x)
+                 (if (good-enough? guess x)
+                     guess
+                     (sqrt-iter (improve guess x)
+                                x)))"""),
+          c("""(define (improve guess x)
+                 (average guess (/ x guess)))"""),
+          c("""(define (average x y)
+                 (/ (+ x y) 2))"""),
+          c("""(define (good-enough? guess x)
+                 (< (abs (- (square guess) x)) 0.001))"""),
+          c("""(define (sqrt x)
+                 (sqrt-iter 1.0 x))"""),
 
-    t("+", "Internal procedure '+'")
-    t("(define round square)")
-    t("(round 5)", "25")
+          # # These may or may not pass; they do on my
+          # # Macbook Pro:
+          # # c("(sqrt 9)", "3.0")
+          # # c("(square (sqrt 100))", "100.0"),
 
-    # p. 30
-    t("""(define (sqrt x)
-           (define (good-enough? guess)
-             (< (abs (- (square guess) x)) 0.001))
-           (define (improve guess)
-             (average guess (/ x guess)))
-           (define (sqrt-iter guess)
-             (if (good-enough? guess)
-               guess
-               (sqrt-iter (improve guess))))
-           (sqrt-iter 1.0))""")
-    t("(sqrt 9)", "3.0")
+          # p. 30
+          c("""(define (sqrt x)
+                 (define (good-enough? guess)
+                   (< (abs (- (square guess) x)) 0.001))
+                 (define (improve guess)
+                   (average guess (/ x guess)))
+                 (define (sqrt-iter guess)
+                   (if (good-enough? guess)
+                     guess
+                     (sqrt-iter (improve guess))))
+                 (sqrt-iter 1.0))"""),
+          c("(sqrt 9)", "3.0"))
+
+    cases(c("(define (a) 3)"),
+          c("(a)", "3"))
+    cases(c("(define (a) (+ 1 2))"),
+          c("(a)", "3"))
+    cases(c("(define (a) 1 666)"),
+          c("(a)", "666"))
+    cases(c("""(define (a)
+                 (define b 3)
+                 b)"""),
+          c("(a)", "3"))
+    cases(c("""(define (a)
+                 (define (f) 4)
+                 (f))"""),
+          c("(a)", "4"))
+    cases(c("+", "Internal procedure '+'"))
 
     # p. 37
-    t("""(define (fib n)
-           (cond ((= n 0) 0)
-                 ((= n 1) 1)
-                 (else (+ (fib (- n 1))
-                          (fib (- n 2))))))""")
-    t("(fib 5)", "5")
+    cases(c("""(define (fib n)
+                 (cond ((= n 0) 0)
+                       ((= n 1) 1)
+                       (else (+ (fib (- n 1))
+                                (fib (- n 2))))))"""),
+          c("(fib 5)", "5"))
 
     # empty list and cons
-    t("(quote ())", "()")
-    t("(cons 3 (quote ()))", "(3)")
-    t("(cons (quote a) (quote ()))", "(a)")
-    t("(cons (quote b) (quote (1 2 3)))", "(b 1 2 3)")
+    cases(c("(quote ())", "()"))
+    cases(c("(cons 3 (quote ()))", "(3)"))
+    cases(c("(cons (quote a) (quote ()))", "(a)"))
+    cases(c("(cons (quote b) (quote (1 2 3)))", "(b 1 2 3)"))
 
     # lambdas and higher-order functions
-    t("(define fn-list (cons square (quote ())))")
-    t("((car fn-list) 3)", "9")
-
-    t("(lambda (x) 3)", "Anonymous-function")
-    t("((lambda (x) 3) 1)", "3")
-    t("((lambda (x) 6) 1 2 3)", "6")
+    cases(c("(define fn-list (cons square (quote ())))"),
+          c("((car fn-list) 3)", "9"))
+    cases(c("(lambda (x) 3)", "Anonymous-function"))
+    cases(c("((lambda (x) 3) 1)", "3"))
+    cases(c("((lambda (x) 6) 1 2 3)", "6"))
 
     # p. 45
-    t("(remainder 10 3)", "1")
+    cases(c("(remainder 10 3)", "1"))
