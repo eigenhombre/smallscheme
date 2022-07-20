@@ -5,12 +5,14 @@ smallscheme
 
 ![build](https://github.com/eigenhombre/smallscheme/actions/workflows/test.yml/badge.svg)
 
-A tiny (< 400 lines) Scheme written in Python to prepare for [this
+A tiny (< 400 lines) Scheme written in Python.
+
+Originally written as a warmup exercise to prepare for [this
 class](https://www.dabeaz.com/sicp.html).
 
 Currently, this Scheme implements everything needed to follow along in
 [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
-up to page **54**.
+up to page **54**.  The implementation is very lightweight and can be installed on any Python 3 installation as follows:
 
 # Install
 
@@ -20,7 +22,7 @@ up to page **54**.
 
 ## REPL
 
-Use `rlwrap` if you want history and that sort of thing:
+Use `rlwrap` if you want arrow-key history, line editing, and that sort of thing:
 
     $ rlwrap smallscheme
     scheme> (define (fact n) (if (< n 2) n (* n (fact (- n 1)))))
@@ -41,11 +43,13 @@ Example:
           n
           (* n (fact (- n 1)))))
 
-    (define f10 (fact 10))
+    (define f100 (fact 100))
 
-    (display f10)
+    (display f100)
     $  smallscheme test.scm
-    3628800
+    933262154439441526816992388562667004907159682643816214685929638
+    952175999932299156089414639761565182862536979208272237582511852
+    10916864000000000000000000000000
     $
 
 # Language
@@ -93,21 +97,6 @@ in print or (free!) online.
 ## Tests
 
     pytest
-
-# Done
-
-1. Lexing and parsing of atoms and s-expressions
-1. Read-Eval-Print
-1. Special forms `quote if cond define or and lambda`
-1. Functions `+ - / * = < > not car cdr cons remainder random`
-1. Local (block or function level defines)
-1. Program file evaluation (e.g., `scheme.py myprog.scm`)
-
-# Next steps
-
-1. Go further in SICP for examples / tests / requirements
-1. `runtime` and `newline` functions
-1. Python interop?
 
 # License
 
