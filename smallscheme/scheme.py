@@ -175,7 +175,11 @@ def randint(arg):
     return int_(random.randint(0, v - 1))
 
 def display(arg):
-    print(printable_value(arg[0]))
+    print(printable_value(arg[0]), end='')
+    return noop
+
+def newline(_):
+    print()
     return noop
 
 def is_assert(arg):
@@ -207,6 +211,7 @@ dispatch_table = {'+': plus,
                   'random': randint,
                   'cons': cons,
                   'display': display,
+                  'newline': newline,
                   'is': is_assert,
                   'test': do_as_test}
 

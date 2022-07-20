@@ -22,13 +22,13 @@ def main():
     args = parser.parse_args()
 
     test_files = vars(args).get('test_files')
-    if len(test_files) > 0:
+    if test_files and len(test_files) > 0:
         for f in test_files:
             run_file(f)
         return
 
     files = vars(args).get('files')
-    if len(files) > 0:
+    if files and len(files) > 0:
         for f in files:
             run_file(f)
     else:

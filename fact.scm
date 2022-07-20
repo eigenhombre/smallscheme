@@ -7,4 +7,5 @@
 (define f100 (fact 100))
 
 (display f100)
+(newline)
 
