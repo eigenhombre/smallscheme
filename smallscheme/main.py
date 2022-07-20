@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import argparse
 import sys
-from scheme import evalu, repl
+import argparse
+from scheme import evalu, repl, parse_str
 
 def run_file(filename):
     env = {}
@@ -12,8 +12,15 @@ def run_file(filename):
         evalu(p, env)
 
 def main():
-    if len(sys.argv) > 1:
-        run_file(sys.argv[1])
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'files', metavar='file', type=str, nargs='*',
+        help='Files to process; if none given, a REPL will start')
+    args = parser.parse_args()
+    files = vars(args).get('files')
+    if len(files) > 0:
+        for f in files:
+            run_file(f)
     else:
         repl()
 

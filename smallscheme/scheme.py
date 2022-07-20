@@ -2,6 +2,7 @@ import lark
 import operator
 import random
 import re
+import sys
 from functools import reduce
 
 parser = lark.Lark(
