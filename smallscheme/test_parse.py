@@ -10,6 +10,11 @@ def test_parse_str():
     t("3.1415", float_(3.1415))
     t("+3.1415", float_(3.1415))
     t("-3.1415", float_(-3.1415))
+    t("1", int_(1))
+    t("1;", int_(1))
+    t("1 ;; hello, I'm a comment", int_(1))
+    t("""1 ;; a comment and a newline
+""", int_(1))
     t("x", atom('x'))
     t("y", atom('y'))
     t("yxyz", atom('yxyz'))

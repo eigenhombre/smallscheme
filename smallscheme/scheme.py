@@ -23,8 +23,12 @@ ATOM   : /[a-zA-Z]+[a-zA-Z0-9\-\?]*/
        | /[\-\+](?![0-9])/
 FLOAT  : /[-+]?[0-9]+\.[0-9]*/
 _num   : INT | FLOAT
+COMMENT : ";" /(.)*/ NEWLINE?
+
 %import common.WS
+%import common.NEWLINE
 %ignore WS
+%ignore COMMENT
     ''')
 
 def atom(x):
@@ -186,7 +190,8 @@ def do_as_test(args):
     evaluate all the arguments and return the last one.  This
     may change as the test framework gets more features.
     """
-    return args[-1]
+    if args:
+        return args[-1]
 
 dispatch_table = {'+': plus,
                   '*': times,

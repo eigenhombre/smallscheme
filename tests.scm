@@ -1,8 +1,152 @@
 (test
+ ;; basic truthy / equality stuff
+ (is #t)
+ (is (not #f))
+ (is 0)
+ (is ())
+ (is (quote nothingness))
  (is (= 1 1))
- (is (not (= 1 2))))
+ (is (not (= 1 2)))
+ (is (= 2 (+ 1 1))))
 
 (test
- (is #t)
- (is (= 1 1)))
+ ;; basic state / defines
+ (define b 4)
+ (define a 3)
+ (is (= 13 (+ 1 (* a b)))))
+
+(define (square x)
+  (* x x))
+
+(test
+ (is (= 441 (square 21)))
+ (is (= 49 (square (+ 2 5))))
+ (is (= 81 (square (square 3))))
+ (define (sum-of-squares x y)
+   (+ (square x) (square y)))
+ (is (= 25 (sum-of-squares 3 4)))
+ (define (f a)
+   (sum-of-squares (+ a 1) (* a 2)))
+ (is (= 136 (f 5)))
+ (define round square)
+ (is (= 25 (round 5))))
+
+(test
+ (define (f x y)
+   (+ x y))
+ (is (= 3 (f 1 2))))
+
+(test
+ (define (abs x)
+   (cond ((> x 0) x)
+         ((= x 0) 0)
+         ((< x 0) (- x))))
+ (is (= 10 (abs 10)))
+ (is (= 10 (abs -10)))
+
+ (define (abs x)
+   (if (< x 0)
+       (- x)
+       x))
+ (is (= 10 (abs 10)))
+ (is (= 10 (abs -10)))
+
+ (define (abs x)
+   (cond ((< x 0) (- x))
+         (else x)))
+
+ (is (= 10 (abs 10)))
+ (is (= 10 (abs -10))))
+
+(test
+ (define (factorial n)
+   (if (= n 1)
+       1
+       (* n (factorial (- n 1)))))
+ (is (= 1 (factorial 1)))
+ (is (= 2 (factorial 2)))
+ (is (= 6 (factorial 3)))
+ (is (= 3628800 (factorial 10)))
+ (is (= 2432902008176640000 (factorial 20))))
+
+
+;; # P. 23-24:
+(test
+ (define (sqrt-iter guess x)
+   (if (good-enough? guess x)
+       guess
+       (sqrt-iter (improve guess x)
+                  x)))
+ (define (improve guess x)
+    (average guess (/ x guess)))
+ (define (average x y)
+    (/ (+ x y) 2))
+ (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+ (define (sqrt x)
+    (sqrt-iter 1.0 x))
+
+ ;; These may or may not pass; they do on my
+ ;; Macbook Pro:
+ ;; (is (= 3.0 (sqrt 9))
+ ;; (is (= 100.0 (square (sqrt 100))))
+)
+
+(test
+ ;; p. 30
+ (define (sqrt x)
+   (define (good-enough? guess)
+     (< (abs (- (square guess) x)) 0.001))
+   (define (improve guess)
+     (average guess (/ x guess)))
+   (define (sqrt-iter guess)
+     (if (good-enough? guess)
+         guess
+         (sqrt-iter (improve guess))))
+   (sqrt-iter 1.0))
+ (is (= 3.0 (sqrt 9))))
+
+(test
+ (define (a) 3)
+ (is (= 3 (a)))
+ (define (a) (+ 1 2))
+ (is (= 3 (a)))
+ (define (a) 1 666)
+ (is (= 666 (a)))
+ (define (a)
+   (define b 3)
+   b)
+ (is (= 3 (a)))
+ (define (a)
+   (define (f) 4)
+   (f))
+ (is (= 4 (a))))
+
+(test
+ ;; # p. 37
+ (define (fib n)
+   (cond ((= n 0) 0)
+         ((= n 1) 1)
+         (else (+ (fib (- n 1))
+                  (fib (- n 2))))))
+ (is (= 5 (fib 5))))
+
+(test
+ ;; empty list and cons
+ (is (= () (quote ())))
+ (is (= (quote (3)) (cons 3 (quote ()))))
+ (is (= (quote (a)) (cons (quote a) ())))
+ (is (= (quote (b 1 2 3)) (cons (quote b) (quote (1 2 3))))))
+
+(test
+ ;; lambdas and higher-order functions
+ (define fn-list (cons square (quote ())))
+ (is (= 9 ((car fn-list) 3)))
+ (is (= 3 ((lambda (x) 3) 1)))
+ ;; Hmmm.... arity??
+ (is (= 6 ((lambda (x) 6) 1 2 3))))
+
+(test
+ ;; # p. 45
+ (is (= 1 (remainder 10 3))))
 
