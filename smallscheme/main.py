@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import sys
 from scheme import evalu, repl
 
