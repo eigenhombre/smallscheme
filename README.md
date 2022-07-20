@@ -33,13 +33,13 @@ Use `rlwrap` if you want arrow-key history, line editing, and that sort of thing
     scheme> ^D
     $
 
-See [test_scheme.py](https://github.com/eigenhombre/smallscheme/blob/master/smallscheme/test_scheme.py) for many more examples.
+See [tests.scm](https://github.com/eigenhombre/smallscheme/blob/master/smallscheme/tests.scm) for many more examples.
 
 ## Running Programs
 
 Example:
 
-    $  cat test.scm
+    $  cat fact.scm
     (define (fact n)
       (if (< n 2)
           n
@@ -48,7 +48,7 @@ Example:
     (define f100 (fact 100))
 
     (display f100)
-    $  smallscheme test.scm
+    $  smallscheme fact.scm
     933262154439441526816992388562667004907159682643816214685929638
     952175999932299156089414639761565182862536979208272237582511852
     10916864000000000000000000000000
@@ -98,7 +98,11 @@ in print or (free!) online.
 
 ## Tests
 
-    pytest
+Python tests are run with `pytest`.
+
+Scheme tests are run with `./smallscheme/main.py -t tests.scm`.  These
+tests are particularly helpful in seeing what's been implemented so
+far.
 
 # License
 

@@ -174,6 +174,20 @@ def display(arg):
     print(printable_value(arg[0]))
     return noop
 
+def is_assert(arg):
+    t, v = arg[0]
+    if v == False:
+        raise AssertionError(f"is / assert failed: {arg}")
+    return noop
+
+def do_as_test(args):
+    """
+    For now, the `test` expression is simply a `progn` / `do`:
+    evaluate all the arguments and return the last one.  This
+    may change as the test framework gets more features.
+    """
+    return args[-1]
+
 dispatch_table = {'+': plus,
                   '*': times,
                   '-': minus,
@@ -187,7 +201,9 @@ dispatch_table = {'+': plus,
                   'remainder': remainder,
                   'random': randint,
                   'cons': cons,
-                  'display': display}
+                  'display': display,
+                  'is': is_assert,
+                  'test': do_as_test}
 
 def intern(env, atom_name, item):
     env[atom_name] = item
@@ -216,6 +232,10 @@ def eval_atom(atom_name, env):
         return env[atom_name]
     else:
         raise Exception("Unbound atom '%s'!" % atom_name)
+
+def intern_fn(env, fn_name, args, body):
+    lambd = ('fn', (fn_name, args, body))
+    intern(env, fn_name, lambd)
 
 def eval_list(l, env):
     # Empty list:
@@ -251,8 +271,7 @@ def eval_list(l, env):
             return noop
         elif typ == 'list':
             (_, fn_name), args = val[0], val[1:]
-            lambd = ('fn', (fn_name, args, l[2:]))
-            intern(env, fn_name, lambd)
+            intern_fn(env, fn_name, args, l[2:])
             return noop
         else:
             raise Exception("Don't know how to bind '%s'!" % typ)

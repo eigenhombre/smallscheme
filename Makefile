@@ -12,6 +12,8 @@ venv:
 
 test:
 	. venv/bin/activate && pytest
+	. venv/bin/activate && ./smallscheme/main.py -t tests.scm
+
 
 lint:
 	. venv/bin/activate && pycodestyle smallscheme

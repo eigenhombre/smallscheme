@@ -16,7 +16,17 @@ def main():
     parser.add_argument(
         'files', metavar='file', type=str, nargs='*',
         help='Files to process; if none given, a REPL will start')
+    parser.add_argument(
+        '-t', dest='test_files', action='append',
+        help='Run test file')
     args = parser.parse_args()
+
+    test_files = vars(args).get('test_files')
+    if len(test_files) > 0:
+        for f in test_files:
+            run_file(f)
+        return
+
     files = vars(args).get('files')
     if len(files) > 0:
         for f in files:
