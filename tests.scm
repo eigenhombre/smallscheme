@@ -147,6 +147,41 @@
  (is (= 6 ((lambda (x) 6) 1 2 3))))
 
 (test
- ;; # p. 45
+ ;; p. 45
  (is (= 1 (remainder 10 3))))
 
+(test
+ ;; p. 50 -- most of this is copied from SICP directly:
+ (define (smallest-divisor n)
+   (find-divisor n 2))
+ (define (find-divisor n test-divisor)
+   (cond ((> (square test-divisor) n) n)
+         ((divides? test-divisor n) test-divisor)
+         (else (find-divisor n (+ test-divisor 1)))))
+ (define (divides? a b)
+   (= (remainder b a) 0))
+ (define (prime? n)
+   (= n (smallest-divisor n)))
+ (is (prime? 1))
+ (is (prime? 2))
+ (is (prime? 3))
+ (is (not (prime? 4)))
+ (is (prime? 5))
+ (is (not (prime? 6)))
+ (is (prime? 7))
+ (is (not (prime? 8)))
+ (is (not (prime? 9)))
+ (is (not (prime? 10))))
+
+(test
+ ;; p. 59
+ (define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+ (define (inc n) (+ n 1))
+ (define (cube x) (* x x x))
+ (define (sum-cubes a b)
+   (sum cube a inc b))
+ (is (= 3025 (sum-cubes 1 10))))

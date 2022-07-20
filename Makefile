@@ -11,7 +11,7 @@ venv:
 	virtualenv venv
 
 test:
-	. venv/bin/activate && pytest
+	. venv/bin/activate && pytest -s
 	. venv/bin/activate && ./smallscheme/main.py fact.scm
 	. venv/bin/activate && ./smallscheme/main.py -t tests.scm
 

@@ -182,6 +182,21 @@ def newline(_):
     print()
     return noop
 
+# System time in msec for use in benchmarking:
+if(sys.version_info.major >= 3 and
+   sys.version_info.minor >= 7):
+    import time
+
+    def runtime(_):
+        return int(time.time_ns() / 1E6)
+else:
+    import datetime
+
+    def runtime(_):
+        return int(
+            (datetime.datetime.utcnow() -
+             datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+
 def is_assert(arg):
     t, v = arg[0]
     if v is False:
@@ -212,6 +227,7 @@ dispatch_table = {'+': plus,
                   'cons': cons,
                   'display': display,
                   'newline': newline,
+                  'runtime': runtime,
                   'is': is_assert,
                   'test': do_as_test}
 

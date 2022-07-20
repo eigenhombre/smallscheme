@@ -109,6 +109,10 @@ far.
 
 [MIT](https://github.com/eigenhombre/smallscheme/blob/master/LICENSE.txt)
 
+Some code fragments used in tests are copied directly from SICP, which
+is licensed with the Creative Commons "Attribution-ShareAlike 4.0
+International (CC BY-SA 4.0)" license.
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND

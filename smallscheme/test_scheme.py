@@ -1,3 +1,4 @@
+import sys
 from smallscheme.scheme import *
 from smallscheme.test_util import teq
 
@@ -111,6 +112,11 @@ def test_define():
             (env, env1))
 
     t("(define size 2)", "", {'size': int_(2)})
+
+def test_runtime():
+    env = {}
+    assert type(evalu(parse_str("(runtime)")[0],
+                      env)) is int
 
 def test_multiple_defines():
     env = {}
