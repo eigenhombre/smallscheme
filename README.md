@@ -12,7 +12,7 @@ class](https://www.dabeaz.com/sicp.html).
 
 Currently, this Scheme implements everything needed to follow along in
 [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
-up to page **54**.
+up to page **54**.  The implementation is very lightweight and can be installed on any Python 3.0 installation as follows:
 
 # Install
 
