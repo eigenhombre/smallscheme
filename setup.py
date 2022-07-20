@@ -24,7 +24,7 @@ setup(
     packages=['smallscheme'],
     entry_points={
         'console_scripts': [
-            'smallscheme = smallscheme.scheme:main',
+            'smallscheme = smallscheme.main:main',
         ],
     },
     install_requires=[
