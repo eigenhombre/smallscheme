@@ -72,10 +72,13 @@ Implemented so far:
     cdr
     cons
     display
+    newline
     not
     random
     remainder
+    runtime
 
+There are also two simple functions used in the Scheme-language tests: `is` and `test`; `test` currently behaves like a `progn` or `do` in other lisps, in that it collects multiple forms to be evaluated and returns the result of the last evaluation.  `is` is basically `assert`.
 ## Special Forms
 
     and
