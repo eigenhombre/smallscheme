@@ -94,21 +94,6 @@ in print or (free!) online.
 
     pytest
 
-# Done
-
-1. Lexing and parsing of atoms and s-expressions
-1. Read-Eval-Print
-1. Special forms `quote if cond define or and lambda`
-1. Functions `+ - / * = < > not car cdr cons remainder random`
-1. Local (block or function level defines)
-1. Program file evaluation (e.g., `scheme.py myprog.scm`)
-
-# Next steps
-
-1. Go further in SICP for examples / tests / requirements
-1. `runtime` and `newline` functions
-1. Python interop?
-
 # License
 
 [MIT](https://github.com/eigenhombre/smallscheme/blob/master/LICENSE.txt)
