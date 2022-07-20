@@ -22,7 +22,7 @@ up to page **54**.  The implementation is very lightweight and can be installed 
 
 ## REPL
 
-Use `rlwrap` if you want history and that sort of thing:
+Use `rlwrap` if you want arrow-key history, line editing, and that sort of thing:
 
     $ rlwrap smallscheme
     scheme> (define (fact n) (if (< n 2) n (* n (fact (- n 1)))))
