@@ -33,7 +33,7 @@ Use `rlwrap` if you want arrow-key history, line editing, and that sort of thing
     scheme> ^D
     $
 
-See [tests.scm](https://github.com/eigenhombre/smallscheme/blob/master/smallscheme/tests.scm) for many more examples.
+See [tests.scm](https://github.com/eigenhombre/smallscheme/blob/master/tests.scm) for many more examples.
 
 ## Running Programs
 
