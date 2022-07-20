@@ -1,59 +1,11 @@
 from smallscheme.scheme import *
-from pprint import pformat
-
-def teq(a, b):
-    assert a == b, "\n%s\n!=\n%s" % (pformat(a),
-                                     pformat(b))
-
-def test_parse_str():
-    def t(a, b):
-        teq(parse_str(a)[0], b)
-    t("1234", int_(1234))
-    t("-1234", int_(-1234))
-    t("+1234", int_(1234))
-    t("3.1415", float_(3.1415))
-    t("+3.1415", float_(3.1415))
-    t("-3.1415", float_(-3.1415))
-    t("x", atom('x'))
-    t("y", atom('y'))
-    t("yxyz", atom('yxyz'))
-    t("#t", bool_(True))
-    t("#f", bool_(False))
-    t("(a)", list_([atom('a')]))
-    t("(a 1 2)", list_([atom('a'),
-                        int_(1),
-                        int_(2)]))
-    t("(+ 2 3)", list_([atom('+'),
-                        int_(2),
-                        int_(3)]))
-    t("(a 1 (b foo x3))",
-      list_([atom('a'),
-             int_(1),
-             list_([atom('b'),
-                    atom('foo'),
-                    atom('x3')])]))
-    t("(())", list_([list_([])]))
-    t("((a))", list_([list_([atom('a')])]))
-    t("((a b))", list_([list_([atom('a'),
-                               atom('b')])]))
-    t("(a (b))", list_([("atom", "a"),
-                        list_([("atom", "b")])]))
-    t("((a) b)", list_([list_([("atom", "a")]),
-                        ("atom", "b")]))
-    t("(a (b c) d)", list_([atom('a'),
-                            list_([atom('b'),
-                                   atom('c')]),
-                            atom('d')]))
-    t("(+ (* 2 4) (+ 3 5))",
-      list_([atom('+'),
-             list_([atom('*'),
-                    int_(2),
-                    int_(4)]),
-             list_([atom('+'),
-                    int_(3),
-                    int_(5)])]))
+from smallscheme.test_util import teq
 
 def test_evalu():
+    """
+    Thin, lower-level smoke test of `evalu` function.  Much more
+    testing of evaluation is done below.
+    """
     def t(a, b):
         teq(evalu(a, {}), b)
     t(int_(1234), int_(1234))
@@ -72,7 +24,12 @@ def test_evalu():
              atom('b'),
              atom('c')]))
 
-def tt(s1, env, *s2):
+def single_eval_check(s1, s2, env):
+    teq(printable_value(evalu(parse_str(s1)[0],
+                              env)),
+        s2)
+
+def multiple_eval_check(s1, env, *s2):
     ret = None
     for p in parse_str(s1):
         ret = evalu(p, env)
@@ -81,7 +38,7 @@ def tt(s1, env, *s2):
 
 def test_printable_value():
     def t(s1, *s2):
-        tt(s1, {}, *s2)
+        multiple_eval_check(s1, {}, *s2)
 
     t("1234", "1234")
     t("#f", "#f")
@@ -158,7 +115,7 @@ def test_define():
 def test_multiple_defines():
     env = {}
     def t(s1, *s2):
-        tt(s1, env, *s2)
+        multiple_eval_check(s1, env, *s2)
     # Adapted from SICP p. 8:
     t("(define pi 3.14159)")
     t("(define radius 10)")
@@ -179,31 +136,49 @@ def test_random():
         assert t == 'int'
         assert 0 <= v < 10
 
+def test_compound_expressions_with_env():
+    """
+    Define test cases in groups with state / environments
+    accumulating/evolving within but not across the groups.
+    """
+    def c(s1, s2=""):
+        return [s1, s2]
+
+    def cases(*cases):
+        env = {}
+        # Functions used a lot, we'll add to "global" state:
+        setup_cases = ["(define (square x) (* x x))"]
+        for s1 in setup_cases:
+            single_eval_check(s1, "", env)
+
+        for s1, s2 in cases:
+            single_eval_check(s1, s2, env)
+        # Helpful for debugging:
+        # print(env)
+
+    cases(c("(+ 1 1)", "2"))
+    cases(c("(define b 4)"),
+          c("(define a 3)"),
+          c("(+ 1 (* a b))", "13"))
+    cases(c("square", "Function-'square'"),
+          c("(square 21)", "441"),
+          c("(square (+ 2 5))", "49"),
+          c("(square (square 3))", "81"),
+          c("""(define (sum-of-squares x y)
+                 (+ (square x) (square y)))"""),
+          c("(sum-of-squares 3 4)", "25"),
+          c("(define (f a) (sum-of-squares (+ a 1) (* a 2)))"),
+          c("(f 5)", "136"))
+    cases(c("(define (f x y) (+ x y))"))
+    cases(c("(define z 33)"))
+
+# FIXME: Migrate to test_compound_expressions_with_env:
 def test_compound_expressions():
     env = {}
     def t(s1, *s2):
-        tt(s1, env, *s2)
+        multiple_eval_check(s1, env, *s2)
 
-    t("""(define b 4)
-         (define a 3)
-         (+ 1 (* a b))""",
-      "13")
-    t("""(define (square x) (* x x))
-         square""",
-      "Function-'square'")
-    t("(define (f x y) (+ x y))")
-    t("(define z 33)")
-    t("(square 21)", "441")
-    t("(square (+ 2 5))", "49")
-    t("(square (square 3))", "81")
-    t("""(define (sum-of-squares x y)
-           (+ (square x) (square y)))""")
-    t("(sum-of-squares 3 4)", "25")
-    t("""(define (f a)
-           (sum-of-squares (+ a 1) (* a 2)))
-         (f 5)""",
-      "136")
-
+    t("(define (square x) (* x x))")
     t("""(define (abs x)
            (cond ((> x 0) x)
                  ((= x 0) 0)
@@ -233,6 +208,7 @@ def test_compound_expressions():
     t("(factorial 2)", "2")
     t("(factorial 3)", "6")
     t("(factorial 10)", "3628800")
+    t("(factorial 20)", "2432902008176640000")
 
     # P. 23-24:
     t("""(define (sqrt-iter guess x)
