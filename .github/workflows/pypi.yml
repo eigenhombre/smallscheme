@@ -9,4 +9,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build and test
-        run: docker build -t smallscheme .
+        run: docker -f Dockerfile.piptest build -t smallscheme-pip-test .
