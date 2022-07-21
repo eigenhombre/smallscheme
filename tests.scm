@@ -121,7 +121,15 @@
  (define (a)
    (define (f) 4)
    (f))
- (is (= 4 (a))))
+ (is (= 4 (a)))
+
+ ;; This looks weird to me, but it's also how Racket
+ ;; does it.  See set! tests, below.
+ (define a 3)
+ (define (f) (+ 1 a))
+ (is (= 4 (f)))
+ (define a 4)
+ (is (= 5 (f))))
 
 (test
  ;; # p. 37
@@ -186,3 +194,26 @@
  (define (sum-cubes a b)
    (sum cube a inc b))
  (is (= 3025 (sum-cubes 1 10))))
+
+(test
+ ;; begin and set!
+ (begin)
+ (is (= 1 (begin 1)))
+ (is (= 2 (begin 1 2)))
+ (test
+  ;; From https://stackoverflow.com/questions/526082:
+  (define x 3)
+
+  (define (foo)
+    (define x 4)
+    x)
+
+  (define (bar)
+    (set! x 4)
+    x)
+
+  (is (= 4 (foo)))
+  (is (= 3 x))
+  ;; Failing test: YOU ARE HERE (implement set!)
+  ;; (is (= 4 (bar)))
+  ))

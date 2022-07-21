@@ -203,14 +203,18 @@ def is_assert(arg):
         raise AssertionError(f"is / assert failed: {arg}")
     return noop
 
-def do_as_test(args):
+def begin_aka_test(args):
     """
-    For now, the `test` expression is simply a `progn` / `do`:
-    evaluate all the arguments and return the last one.  This
-    may change as the test framework gets more features.
+    For now, the `test` expression is simply a `begin` (like `progn`
+    in Common Lisp or `do` in Clojure): evaluate all the arguments and
+    return the last one.  This may change as the test framework gets
+    more features.
     """
     if args:
         return args[-1]
+
+def set_bang(args):
+    pass
 
 dispatch_table = {'+': plus,
                   '*': times,
@@ -229,7 +233,9 @@ dispatch_table = {'+': plus,
                   'newline': newline,
                   'runtime': runtime,
                   'is': is_assert,
-                  'test': do_as_test}
+                  'test': begin_aka_test,
+                  'begin': begin_aka_test,
+                  'set!': set_bang}
 
 def intern(env, atom_name, item):
     env[atom_name] = item
