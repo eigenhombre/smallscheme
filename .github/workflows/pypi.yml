@@ -1,4 +1,4 @@
-name: PyPITest
+name: Test Install from PyPI
 
 on:
   workflow_dispatch:
