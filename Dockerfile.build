@@ -1,0 +1,15 @@
+FROM python:3.10
+
+RUN apt-get -qq -y update
+RUN apt-get -qq -y upgrade
+
+RUN apt-get install -qq -y make
+
+WORKDIR /scheme
+COPY . /scheme
+RUN pip install --upgrade pip
+RUN pip install pytest
+RUN pip install -e .
+RUN pytest -s
+RUN smallscheme fact.scm
+RUN smallscheme -t tests.scm

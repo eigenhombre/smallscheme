@@ -32,7 +32,10 @@ pypi:
 	. venv/bin/activate && twine upload -r smallscheme dist/*.tar.gz
 
 pip-docker-test:
-	docker build -t smallscheme -f Dockerfile.piptest .
+	docker build -t smallscheme-pip-test -f Dockerfile.piptest .
+
+build-docker-test:
+	docker build -t smallscheme -f Dockerfile.build .
 
 release:
 	./bumpver

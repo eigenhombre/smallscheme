@@ -1,39 +1,18 @@
-name: Test
+name: Build and Test in Docker
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version:
-          - "3.6"
-          - "3.7"
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11.0-alpha - 3.11.0"
-          - "pypy-3.6"
-          - "pypy-3.7"
-          - "pypy-3.8"
-          - "pypy-3.9"
+  build:
+    name: build
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install virtualenv
-        run: pip install virtualenv
-      - name: Create project virtualenv
-        run: make venv
-      - name: Make all the things
-        run: make
+      - name: Run tests
+        run: |
+          make build-docker-test
