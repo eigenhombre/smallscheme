@@ -107,6 +107,7 @@
  (is (= 3.0 (sqrt 9))))
 
 (test
+ ;; scope, nested or otherwise
  (define (a) 3)
  (is (= 3 (a)))
  (define (a) (+ 1 2))
