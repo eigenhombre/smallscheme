@@ -28,7 +28,7 @@ setup(
         ],
     },
     install_requires=[
-        'lark-parser == 0.7.3',
+        'lark == 1.1.2'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

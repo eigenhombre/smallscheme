@@ -1,5 +1,4 @@
-conttest == 0.0.8
-lark-parser == 0.7.3
+lark == 1.1.2
 pycodestyle == 2.5.0
 pytest
 versioneer == 0.22
