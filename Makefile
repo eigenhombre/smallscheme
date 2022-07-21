@@ -15,7 +15,6 @@ test:
 	. venv/bin/activate && ./smallscheme/main.py fact.scm
 	. venv/bin/activate && ./smallscheme/main.py -t tests.scm
 
-
 lint:
 	. venv/bin/activate && pycodestyle smallscheme
 
@@ -36,6 +35,8 @@ pip-docker-test:
 
 build-docker-test:
 	docker build -t smallscheme -f Dockerfile.build .
+
+alltests: test build-docker-test
 
 release:
 	./bumpver

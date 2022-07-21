@@ -1,4 +1,5 @@
-from smallscheme.scheme import *
+from smallscheme.dtypes import *
+from smallscheme.parse import parse_str
 from smallscheme.test_util import teq
 
 def test_parse_str():
