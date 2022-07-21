@@ -31,6 +31,9 @@ pypi-test:
 pypi:
 	. venv/bin/activate && twine upload -r smallscheme dist/*.tar.gz
 
+pip-docker-test:
+	docker build -t smallscheme .
+
 release:
 	./bumpver
 	. venv/bin/activate && python setup.py sdist

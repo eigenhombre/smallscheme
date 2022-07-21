@@ -2,7 +2,7 @@
 
 import sys
 import argparse
-from scheme import evalu, repl, parse_str
+from smallscheme.scheme import evalu, repl, parse_str
 
 def run_file(filename):
     env = {}
