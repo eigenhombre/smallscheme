@@ -34,4 +34,3 @@ pypi:
 release:
 	./bumpver
 	. venv/bin/activate && python setup.py sdist
-
