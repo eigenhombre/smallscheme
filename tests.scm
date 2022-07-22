@@ -37,6 +37,13 @@
  (is (= 3 (f 1 2))))
 
 (test
+ ;; cond
+ ;; Racket with `#lang sicp` returns #<void>:
+ (is (= #f (cond)))
+ (is (= 1 (cond (#t 1))))
+ (is (= 1 (cond (#f 0) (#t 1)))))
+
+(test
  (define (abs x)
    (cond ((> x 0) x)
          ((= x 0) 0)

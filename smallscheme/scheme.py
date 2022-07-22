@@ -22,9 +22,10 @@ def apply(fn_form, args, env):
     return ret  # Last result is returned
 
 def truthy(x):
-    return x != ('bool', False)
+    return x != FALSE
 
-def eval_atom(atom_name, env):
+def eval_atom(atom, env):
+    atom_name = value(atom)
     if atom_name in dispatch_table.keys():
         return ('intproc', atom_name)
     elif atom_name in env:
@@ -36,15 +37,16 @@ def intern_fn(env, fn_name, args, body):
     lambd = ('fn', (fn_name, args, body))
     intern(env, fn_name, lambd)
 
-def eval_list(l, env):
+def eval_list(expr, env):
+    l = value(expr)
     # Empty list:
     if not l:
         return list_([])
     car = l[0]
     # Special forms:
-    if car == atom('quote'):
+    if car == QUOTE:
         return l[1]
-    elif car == atom('cond'):
+    elif car == COND:
         clauses = l[1:]
         for clause in clauses:
             (maybe_list, clauselist) = clause
@@ -53,46 +55,50 @@ def eval_list(l, env):
                                 l[1:])
             pred = clauselist[0]
             if (pred == ('atom', 'else') or
-                evalu(pred, env) != bool_(False)):
+                evalu(pred, env) != FALSE):
                 return evalu(clauselist[1], env)
-        return bool_(True)
-    # FIXME: cond should macroexpand to if or vice-versa?
-    elif car == atom('if'):
+        # Edge case: Racket with `#lang sicp` returns #<void>; we
+        # don't have that, but if nothing matches we should return
+        # something falsey:
+        return FALSE
+    # Maybe `cond` should macroexpand to `if`, or vice-versa?
+    elif car == IF:
         pred = l[1]
         if truthy(evalu(pred, env)):
             return evalu(l[2], env)
         else:
             return evalu(l[3], env)
-    elif car == atom('define'):
-        typ, val = l[1]
+    elif car == DEFINE:
+        var_or_fnpat = l[1]
+        typ, val = typeof(var_or_fnpat), value(var_or_fnpat)
         if typ == 'atom':
             intern(env, val, evalu(l[2], env))
             return noop
         elif typ == 'list':
-            (_, fn_name), args = val[0], val[1:]
+            (_, fn_name), args = typeof(val), val[1:]
             intern_fn(env, fn_name, args, l[2:])
             return noop
         else:
             raise Exception("Don't know how to bind '%s'!" % typ)
-    elif car == atom('lambda'):
+    elif car == LAMBDA:
         typ, val = l[1]
         assert typ == 'list'
         args = val[1:]
         return ('fn', ('lambda', args, l[2:]))
-    elif car == atom('or'):
+    elif car == OR:
         for arg in l[1:]:
             ev = evalu(arg, env)
             if truthy(ev):
                 return ev
-        return bool_(False)
-    elif car == atom('and'):
+        return FALSE
+    elif car == AND:
         ev = None
         for arg in l[1:]:
             ev = evalu(arg, env)
             if not truthy(ev):
-                return bool_(False)
+                return FALSE
         if ev is None:
-            return bool_(True)
+            return TRUE
         else:
             return ev
     else:
@@ -113,15 +119,14 @@ def eval_list(l, env):
         raise Exception('Unknown function name: "%s"'
                         % carval)
 
-def evalu(ast, env):
-    k, v = ast
-    if k == 'int' or k == 'float' or k == 'bool':
-        return ast
-    if k == 'atom':
-        return eval_atom(v, env)
-    if k == 'list':
-        return eval_list(v, env)
-    raise Exception('evaluation error: "%s"' % str(ast))
+def evalu(expr, env):
+    if typeof(expr) in ('int', 'float', 'bool'):
+        return expr
+    if typeof(expr) == 'atom':
+        return eval_atom(expr, env)
+    if typeof(expr) == 'list':
+        return eval_list(expr, env)
+    raise Exception('evaluation error: "%s"' % str(expr))
 
 def inp():
     if sys.version_info > (2, 9):

@@ -13,8 +13,8 @@ def test_evalu():
         teq(evalu(a, {}), b)
     t(int_(1234), int_(1234))
     t(int_(1234), int_(1234))
-    t(bool_(True), bool_(True))
-    t(bool_(False), bool_(False))
+    t(TRUE, TRUE)
+    t(FALSE, FALSE)
     t(atom('+'), ('intproc', '+'))
     t(list_([atom('quote'),
              int_(3)]),

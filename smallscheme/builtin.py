@@ -57,10 +57,9 @@ def greaterthan(args):
     return compare(args, operator.gt)
 
 def notnot(args):
-    if args[0] == bool_(False):
-        return bool_(True)
-    else:
-        return bool_(False)
+    if args[0] == FALSE:
+        return TRUE
+    return FALSE
 
 def car(x):
     typ, l = x[0]

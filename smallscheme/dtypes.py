@@ -13,8 +13,11 @@ def int_(x):
 def float_(x):
     return 'float', x
 
-def typ(x):
+def typeof(x):
     return x[0]
+
+def value(x):
+    return x[1]
 
 noop = 'nop', None
 
@@ -40,3 +43,13 @@ def printable_value(ast):
             return "Anonymous-function"
         return "Function-'%s'" % str(fn_name)
     raise Exception('Unprintable ast "%s"' % str(ast))
+
+QUOTE  = atom('quote')
+COND   = atom('cond')
+IF     = atom('if')
+DEFINE = atom('define')
+LAMBDA = atom('lambda')
+OR     = atom('or')
+AND    = atom('and')
+TRUE   = bool_(True)
+FALSE  = bool_(False)

@@ -1,7 +1,7 @@
 .PHONY: clean all deps pypi-test test install
 .PHONY: lint pypi pypi-test release
 
-all: deps test lint install
+all: deps develop test lint
 
 deps:
 	. venv/bin/activate && pip install --upgrade pip
@@ -18,8 +18,8 @@ test:
 lint:
 	. venv/bin/activate && pycodestyle smallscheme
 
-install:
-	. venv/bin/activate && python setup.py install
+develop:
+	. venv/bin/activate && python setup.py develop
 
 clean:
 	rm -rf *.egg-info dist .pytest_cache *.html venv

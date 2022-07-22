@@ -19,8 +19,8 @@ def test_parse_str():
     t("x", atom('x'))
     t("y", atom('y'))
     t("yxyz", atom('yxyz'))
-    t("#t", bool_(True))
-    t("#f", bool_(False))
+    t("#t", TRUE)
+    t("#f", FALSE)
     t("(a)", list_([atom('a')]))
     t("(a 1 2)", list_([atom('a'),
                         int_(1),
