@@ -10,7 +10,7 @@ A tiny (< 400 lines) Scheme written in Python.
 Originally written as a warmup exercise to prepare for [this
 class](https://www.dabeaz.com/sicp.html).
 
-`smallscheme` is not a complete R7RS Scheme -- it implements
+`smallscheme` is not a complete R7RS Scheme (or R5RS for that matter) -- it implements
 everything needed to follow along in
 [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
 up to page **63**.  `smallscheme` is very lightweight and can be
