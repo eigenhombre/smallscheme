@@ -5,7 +5,7 @@ smallscheme
 
 ![build](https://github.com/eigenhombre/smallscheme/actions/workflows/test.yml/badge.svg)
 
-A tiny (< 400 lines) Scheme written in Python.
+A small Scheme written in Python.
 
 Originally written as a warmup exercise to prepare for [this
 class](https://www.dabeaz.com/sicp.html).
