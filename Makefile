@@ -36,7 +36,7 @@ pip-docker-test:
 build-docker-test:
 	docker build -t smallscheme -f Dockerfile.build .
 
-alltests: test build-docker-test
+alltests: test lint build-docker-test
 
 release:
 	./bumpver

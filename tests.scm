@@ -153,7 +153,49 @@
  (is (= 9 ((car fn-list) 3)))
  (is (= 3 ((lambda (x) 3) 1)))
  ;; Hmmm.... arity??
- (is (= 6 ((lambda (x) 6) 1 2 3))))
+ (is (= 6 ((lambda (x) 6) 1 2 3)))
+ (is (= 1 ((lambda () 1))))
+ ;; Oddly, this works in smallscheme but not in Racket:
+ (define (f x y)
+   ((lambda (a b)
+      (+ (* x (square a))
+         (* y b)
+         (* a b)))
+    (+ 1 (* x y))
+    (- 1 y)))
+ ;; But it gives 81, should give 78... FAILING TEST:
+ ;; (is (= 78 (f 2 3)))
+ (define (f x y)
+   ((lambda (a b)
+      (+ (* y b)
+         (* a b)))
+    (+ 1 (* x y))
+    (- 1 y)))
+ ;; this is 49, should be -20
+ ;; (display (f 2 3))
+  (define (f x y)
+   ((lambda (a b)
+      (* a b))
+    (+ 1 (* x y))
+    (- 1 y)))
+  (display (f 2 3))
+  (newline)
+  ;; 28, should be -14
+  (define (f x y)
+    ((lambda (a b)
+       (* a b))
+    (* x y)
+    y))
+  (display (f 2 3))
+  (newline)
+  ;; 24, should be 18
+  (define (f x)
+    ((lambda (a)
+       (+ a x))
+     3))
+  (display (f 4))
+  (newline)
+ )
 
 (test
  ;; p. 45
