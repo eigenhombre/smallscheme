@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import argparse
 from smallscheme.env import Env
 from smallscheme.scheme import evalu, repl, parse_str

@@ -1,4 +1,3 @@
-import re
 import sys
 from smallscheme.env import Env
 from smallscheme.parse import parse_str
