@@ -22,26 +22,27 @@ def value(x):
 noop = 'nop', None
 
 def printable_value(ast):
-    k, v = ast
-    if k == 'int' or k == 'float':
-        return str(v)
-    if k == 'bool':
+    typ, val = typeof(ast), value(ast)
+    if typ == 'int' or typ == 'float':
+        return str(val)
+    if typ == 'bool':
         return {True: "#t",
-                False: "#f"}.get(v)
-    if k == 'intproc':
-        return "Internal procedure '%s'" % v
-    if k == 'atom':
-        return v
-    if k == 'list':
+                False: "#f"}.get(val)
+    if typ == 'intproc':
+        return "Internal procedure '%s'" % val
+    if typ == 'atom':
+        return val
+    if typ == 'list':
         return '(' + ' '.join([printable_value(x)
-                               for x in v]) + ')'
-    if k == 'nop':
+                               for x in val]) + ')'
+    if typ == 'nop':
         return ''
-    if k == 'fn':
-        (fn_name, _, _) = v
+    if typ == 'fn':
+        (fn_name, _, _) = val
         if fn_name == 'lambda':
             return "Anonymous-function"
         return "Function-'%s'" % str(fn_name)
+
     raise Exception('Unprintable ast "%s"' % str(ast))
 
 QUOTE  = atom('quote')

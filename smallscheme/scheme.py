@@ -1,5 +1,6 @@
 import re
 import sys
+from smallscheme.env import Env
 from smallscheme.parse import parse_str
 from smallscheme.dtypes import *
 from smallscheme.builtin import dispatch_table
@@ -9,17 +10,16 @@ def intern(env, atom_name, item):
 
 def apply(fn_form, args, env):
     (maybe_fn, (fn_name, arg_names, body)) = fn_form
-    if maybe_fn != 'fn':
-        raise Exception('Malformed function definition "%s"!'
-                        % env[fn_name])
-    # THIS IS WRONG. If env changes....
-    new_env = env.copy()
-    for i, x in enumerate(arg_names):
-        intern(new_env, x[1], args[i])
+    assert typeof(fn_form) == 'fn'
+    # FIXME: store env with lambda definition, for lexical closures.
+    new_env = Env(env)
+    for nam, arg in zip(arg_names, args):
+        assert typeof(nam) == 'atom'
+        intern(new_env, value(nam), arg)
     ret = None
     for form in body:
         ret = evalu(form, new_env)
-    return ret  # Last result is returned
+    return ret  # Last result is returned, or None if none
 
 def truthy(x):
     return x != FALSE
@@ -135,7 +135,7 @@ def inp():
         return raw_input("scheme> ")
 
 def repl():
-    env = {}
+    env = Env()
     while True:
         try:
             x = inp().strip()

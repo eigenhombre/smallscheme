@@ -2,10 +2,11 @@
 
 import sys
 import argparse
+from smallscheme.env import Env
 from smallscheme.scheme import evalu, repl, parse_str
 
 def run_file(filename):
-    env = {}
+    env = Env()
     with open(filename) as f:
         txt = f.read()
     for p in parse_str(txt):
