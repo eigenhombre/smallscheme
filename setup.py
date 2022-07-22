@@ -3,8 +3,8 @@ from setuptools import setup
 import versioneer
 
 
-desc = ("A small implementation of enough Scheme "
-        "to follow along in SICP")
+desc = ("A small Scheme implementation, whose aim is to provide enough "
+        "functionality to be used to run examples and work problems in SICP")
 homeurl = "https://github.com/eigenhombre/smallscheme"
 
 
