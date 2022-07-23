@@ -7,12 +7,12 @@ from smallscheme.builtin import dispatch_table
 def intern(env, atom_name, item):
     env[atom_name] = item
 
-def apply(fn_form, args, env):
-    (maybe_fn, (fn_name, arg_names, body)) = fn_form
+def apply(fn_form, arg_vals):
+    (maybe_fn, (fn_name, arg_names, body, fn_env)) = fn_form
     assert typeof(fn_form) == 'fn'
     # FIXME: store env with lambda definition, for lexical closures.
-    new_env = Env(env)
-    for nam, arg in zip(arg_names, args):
+    new_env = Env(fn_env)
+    for nam, arg in zip(arg_names, arg_vals):
         assert typeof(nam) == 'atom'
         intern(new_env, value(nam), arg)
     ret = None
@@ -75,7 +75,10 @@ def eval_list(expr, env):
             fn_name = val[0][1]
             arg_names = val[1:]
             body = l[2:]
-            intern(env, fn_name, make_fn(fn_name, arg_names, body))
+            intern(env, fn_name, make_fn(fn_name,
+                                         arg_names,
+                                         body,
+                                         env))
             return noop
         else:
             raise Exception("Don't know how to define '%s'!" % l[1:])
@@ -84,7 +87,8 @@ def eval_list(expr, env):
         assert typ == 'list'
         args = val[1:]
         body = l[2:]
-        return make_fn('lambda', args, body)
+        lambda_args = l[1]
+        return make_fn('lambda', lambda_args[1], body, env)
     elif car == OR:
         for arg in l[1:]:
             ev = evalu(arg, env)
@@ -108,14 +112,14 @@ def eval_list(expr, env):
         cartype, carval = car
         if cartype == 'list':
             hof = evalu(l[0], env)
-            return apply(hof, args_evaled, env)
+            return apply(hof, args_evaled)
         # Internally-supplied functions:
         fn = dispatch_table.get(carval, None)
         if fn:
             return fn(args_evaled)
         # User-defined functions:
         if carval in env:
-            return apply(env[carval], args_evaled, env)
+            return apply(env[carval], args_evaled)
         raise Exception('Unknown function name: "%s"'
                         % carval)
 

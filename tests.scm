@@ -114,6 +114,10 @@
  (is (= 3.0 (sqrt 9))))
 
 (test
+ ;; p. 45
+ (is (= 1 (remainder 10 3))))
+
+(test
  ;; scope, nested or otherwise
  (define (a) 3)
  (is (= 3 (a)))
@@ -162,11 +166,22 @@
  ;; Hmmm.... arity??
  (is (= 6 ((lambda (x) 6) 1 2 3)))
  (is (= 1 ((lambda () 1))))
+ (is (= 1 ((lambda (a) 1) 2)))
+ (define (ident b) b)
+ (is (= 1 (ident 1)))
+ (is (= 1 ((lambda (a) a) 1)))
  (define (make-ident) (lambda (x) x))
  (define my-identity (make-ident))
- ;; FAILS:
- ;; (my-identity 3)
- ;; Oddly, this works in smallscheme but not in Racket:
+ (is (= 3 (my-identity 3)))
+
+ (define a 3)
+ (define (f) (+ 1 a))
+ (is (= 4 (f)))
+ (define a 4)
+ ;; Define overrides global bindings: Racket does this too:
+ (is (= 5 (f)))
+
+ ;; P. 64:
  (define (f x y)
    ((lambda (a b)
       (+ (* x (square a))
@@ -174,43 +189,7 @@
          (* a b)))
     (+ 1 (* x y))
     (- 1 y)))
- ;; But it gives 81, should give 78... FAILING TEST:
- ;; (is (= 78 (f 2 3)))
- (define (f x y)
-   ((lambda (a b)
-      (+ (* y b)
-         (* a b)))
-    (+ 1 (* x y))
-    (- 1 y)))
- ;; this is 49, should be -20
- ;; (display (f 2 3))
-  (define (f x y)
-   ((lambda (a b)
-      (* a b))
-    (+ 1 (* x y))
-    (- 1 y)))
-  (display (f 2 3))
-  (newline)
-  ;; 28, should be -14
-  (define (f x y)
-    ((lambda (a b)
-       (* a b))
-    (* x y)
-    y))
-  (display (f 2 3))
-  (newline)
-  ;; 24, should be 18
-  (define (f x)
-    ((lambda (a)
-       (+ a x))
-     3))
-  (display (f 4))
-  (newline)
- )
-
-(test
- ;; p. 45
- (is (= 1 (remainder 10 3))))
+ (is (= 78 (f 2 3))))
 
 (test
  ;; p. 50 -- most of this is copied from SICP directly:

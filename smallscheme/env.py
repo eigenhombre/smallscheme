@@ -23,6 +23,17 @@ class Env(object):
             ret[k] = v
         return ret
 
+    def tree(self):
+        if self.__parent is None:
+            parent = None
+        else:
+            parent = self.__parent.tree()
+        return {"values": self.__values,
+                "parent": parent}
+
+    def __repr__(self):
+        return str(self.tree())
+
     def __contains__(self, k):
         if k in self.__values:
             return True

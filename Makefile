@@ -10,10 +10,12 @@ deps:
 venv:
 	virtualenv venv
 
-test:
+scheme-unit-tests:
+	. venv/bin/activate && ./smallscheme/main.py -t tests.scm
+
+test: scheme-unit-tests
 	. venv/bin/activate && pytest -s
 	. venv/bin/activate && ./smallscheme/main.py fact.scm
-	. venv/bin/activate && ./smallscheme/main.py -t tests.scm
 
 lint:
 	. venv/bin/activate && pycodestyle smallscheme

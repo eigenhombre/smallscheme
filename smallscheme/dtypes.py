@@ -13,8 +13,8 @@ def int_(x):
 def float_(x):
     return 'float', x
 
-def make_fn(fn_name, args, body):
-    return 'fn', (fn_name, args, body)
+def make_fn(fn_name, args, body, env):
+    return 'fn', (fn_name, args, body, env)
 
 def typeof(x):
     return x[0]
