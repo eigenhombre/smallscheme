@@ -32,10 +32,6 @@ def eval_atom(atom, env):
     else:
         raise Exception("Unbound atom '%s'!" % atom_name)
 
-def intern_fn(env, fn_name, args, body):
-    lambd = ('fn', (fn_name, args, body))
-    intern(env, fn_name, lambd)
-
 def eval_list(expr, env):
     l = value(expr)
     # Empty list:
@@ -69,21 +65,26 @@ def eval_list(expr, env):
             return evalu(l[3], env)
     elif car == DEFINE:
         var_or_fnpat = l[1]
-        typ, val = typeof(var_or_fnpat), value(var_or_fnpat)
+        typ = typeof(var_or_fnpat)
         if typ == 'atom':
-            intern(env, val, evalu(l[2], env))
+            binding_name = value(var_or_fnpat)
+            intern(env, binding_name, evalu(l[2], env))
             return noop
         elif typ == 'list':
-            (_, fn_name), args = typeof(val), val[1:]
-            intern_fn(env, fn_name, args, l[2:])
+            val = value(var_or_fnpat)
+            fn_name = val[0][1]
+            arg_names = val[1:]
+            body = l[2:]
+            intern(env, fn_name, make_fn(fn_name, arg_names, body))
             return noop
         else:
-            raise Exception("Don't know how to bind '%s'!" % typ)
+            raise Exception("Don't know how to define '%s'!" % l[1:])
     elif car == LAMBDA:
         typ, val = l[1]
         assert typ == 'list'
         args = val[1:]
-        return ('fn', ('lambda', args, l[2:]))
+        body = l[2:]
+        return make_fn('lambda', args, body)
     elif car == OR:
         for arg in l[1:]:
             ev = evalu(arg, env)

@@ -162,6 +162,10 @@
  ;; Hmmm.... arity??
  (is (= 6 ((lambda (x) 6) 1 2 3)))
  (is (= 1 ((lambda () 1))))
+ (define (make-ident) (lambda (x) x))
+ (define my-identity (make-ident))
+ ;; FAILS:
+ ;; (my-identity 3)
  ;; Oddly, this works in smallscheme but not in Racket:
  (define (f x y)
    ((lambda (a b)
