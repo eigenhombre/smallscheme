@@ -13,7 +13,7 @@ class](https://www.dabeaz.com/sicp.html).
 `smallscheme` is not a complete R7RS Scheme (or R5RS for that matter) -- it implements
 everything needed to follow along in
 [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
-up to page **68**.  `smallscheme` is very lightweight and can be
+up to page **85**.  `smallscheme` is very lightweight and can be
 installed on any Python 3 installation as follows:
 
 # Install
@@ -101,8 +101,10 @@ in print or (free!) online.
 
 ## Caveat
 
-Not a production-ready language implementation -- error messages
-and performance in particular may not be the best.
+Not a production-ready language implementation -- error messages and
+performance in particular may not be the best.  Features used in later
+parts of SICP may not be available yet. I have been implementing
+them roughly in the order they are introduced.
 
 # Local Development
 
