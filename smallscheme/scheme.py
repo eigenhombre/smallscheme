@@ -10,15 +10,12 @@ def intern(env, atom_name, item):
 def apply(fn_form, arg_vals):
     (maybe_fn, (fn_name, arg_names, body, fn_env)) = fn_form
     assert typeof(fn_form) == 'fn'
-    # FIXME: store env with lambda definition, for lexical closures.
     new_env = Env(fn_env)
     for nam, arg in zip(arg_names, arg_vals):
         assert typeof(nam) == 'atom'
         intern(new_env, value(nam), arg)
-    ret = None
-    for form in body:
-        ret = evalu(form, new_env)
-    return ret  # Last result is returned, or None if none
+    results = [evalu(form, new_env) for form in body]
+    return results[-1]
 
 def truthy(x):
     return x != FALSE
@@ -53,8 +50,8 @@ def eval_list(expr, env):
                 evalu(pred, env) != FALSE):
                 return evalu(clauselist[1], env)
         # Edge case: Racket with `#lang sicp` returns #<void>; we
-        # don't have that, but if nothing matches we should return
-        # something falsey:
+        # don't have a void value (yet), but if nothing matches we
+        # should return something falsey:
         return FALSE
     # Maybe `cond` should macroexpand to `if`, or vice-versa?
     elif car == IF:
