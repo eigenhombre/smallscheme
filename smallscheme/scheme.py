@@ -29,30 +29,70 @@ def eval_atom(atom, env):
     else:
         raise Exception("Unbound atom '%s'!" % atom_name)
 
+def eval_let(env, bindings, body):
+    """
+    `let` can be a syntactic transformation of a lambda
+    expression, but we implement it directly here in this function.
+    """
+    new_env = Env(env)
+    for ll in value(bindings):
+        assert typeof(ll) == 'list', 'bindings must be a list'
+        pair = value(ll)
+        assert len(pair) == 2, 'bindings must be pairs'
+        nam, arg = pair
+        assert typeof(nam) == 'atom', 'binding LHS must be atom'
+        intern(new_env, value(nam), evalu(arg, env))
+    args_evaled = [evalu(x, new_env) for x in body]
+    return args_evaled[-1]
+
+def eval_cond(env, clauses):
+    for clause in clauses:
+        (maybe_list, clauselist) = clause
+        if maybe_list != 'list':
+            raise Exception('Cond clause "%s" not a list!"' %
+                            l[1:])
+        pred = clauselist[0]
+        if (pred == ('atom', 'else') or
+            evalu(pred, env) != FALSE):
+            return evalu(clauselist[1], env)
+    # Edge case: Racket with `#lang sicp` returns #<void>; we
+    # don't have a void value (yet), but if nothing matches we
+    # should return something falsey:
+    return FALSE
+
+def eval_define(env, args):
+    var_or_fnpat = args[0]
+    typ = typeof(var_or_fnpat)
+    if typ == 'atom':
+        binding_name = value(var_or_fnpat)
+        intern(env, binding_name, evalu(args[1], env))
+        return noop
+    elif typ == 'list':
+        val = value(var_or_fnpat)
+        fn_name = val[0][1]
+        arg_names = val[1:]
+        body = args[1:]
+        intern(env, fn_name, make_fn(fn_name,
+                                     arg_names,
+                                     body,
+                                     env))
+        return noop
+    else:
+        raise Exception("Don't know how to define '%s'!" % l[1:])
+
 def eval_list(expr, env):
     l = value(expr)
     # Empty list:
     if not l:
-        return list_([])
+        return EMPTYLIST
     car = l[0]
     # Special forms:
     if car == QUOTE:
         return l[1]
+    elif car == LET:
+        return eval_let(env, l[1], l[2:])
     elif car == COND:
-        clauses = l[1:]
-        for clause in clauses:
-            (maybe_list, clauselist) = clause
-            if maybe_list != 'list':
-                raise Exception('Cond clause "%s" not a list!"' %
-                                l[1:])
-            pred = clauselist[0]
-            if (pred == ('atom', 'else') or
-                evalu(pred, env) != FALSE):
-                return evalu(clauselist[1], env)
-        # Edge case: Racket with `#lang sicp` returns #<void>; we
-        # don't have a void value (yet), but if nothing matches we
-        # should return something falsey:
-        return FALSE
+        return eval_cond(env, l[1:])
     # Maybe `cond` should macroexpand to `if`, or vice-versa?
     elif car == IF:
         pred = l[1]
@@ -61,24 +101,7 @@ def eval_list(expr, env):
         else:
             return evalu(l[3], env)
     elif car == DEFINE:
-        var_or_fnpat = l[1]
-        typ = typeof(var_or_fnpat)
-        if typ == 'atom':
-            binding_name = value(var_or_fnpat)
-            intern(env, binding_name, evalu(l[2], env))
-            return noop
-        elif typ == 'list':
-            val = value(var_or_fnpat)
-            fn_name = val[0][1]
-            arg_names = val[1:]
-            body = l[2:]
-            intern(env, fn_name, make_fn(fn_name,
-                                         arg_names,
-                                         body,
-                                         env))
-            return noop
-        else:
-            raise Exception("Don't know how to define '%s'!" % l[1:])
+        return eval_define(env, l[1:])
     elif car == LAMBDA:
         typ, val = l[1]
         assert typ == 'list'

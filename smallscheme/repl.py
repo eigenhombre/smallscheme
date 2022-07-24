@@ -26,5 +26,10 @@ def repl():
                     pv = printable_value(evalu(parsed, env))
                     if pv:
                         print(pv)
+            except AssertionError as ae:
+                if not ae.args:
+                    print("AssertionError (our fault)!")
+                else:
+                    print(ae)
             except Exception as e:
                 print(e)

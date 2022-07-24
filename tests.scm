@@ -4,6 +4,7 @@
  (is (not #f))
  (is 0)
  (is ())
+ (is (= () ()))
  (is (= (quote being) (quote being)))
  (is (quote nothingness))
  (is (not (= (quote being) (quote nothingness))))
@@ -251,3 +252,38 @@
   ;; Failing test: YOU ARE HERE (implement set!)
   ;; (is (= 4 (bar)))
   ))
+
+(test
+ ;; let
+ ;; FIXME: test that `(let ())` returns sensible error.
+ ;; (is (= 1 (let () 1)))
+ ;; (is (= 3 (let () 1 2 3)))
+ (is (= 1 (let ((a 1))
+            a)))
+ (is (= 0 (let ((a 1)
+                (b 0)
+                (c 3))
+            b)))
+ (is (= 2 (let ((b (+ 1 1)))
+            b)))
+ (is (= 3 (let ((a 1)
+                (b 2))
+            (+ a b))))
+ ;; P. 64:
+ (define (f x y)
+   (let ((a (+ 1 (* x y)))
+         (b (- 1 y)))
+     (+ (* x (square a))
+        (* y b)
+        (* a b))))
+ (is (= 78 (f 2 3)))
+ (= 38  ;; P. 65
+    (let ((x 5))
+      (+ (let ((x 3))
+           (+ x (* x 10)))
+         x)))
+ (= 12
+    (let ((x 2))
+      (let ((x 3)
+            (y (+ x 2)))
+        (* x y)))))
