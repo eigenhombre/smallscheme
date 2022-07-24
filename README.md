@@ -22,18 +22,18 @@ installed on any Python 3 installation as follows:
 
 # Usage
 
+See [tests.scm](https://github.com/eigenhombre/smallscheme/blob/master/tests.scm) for many examples of the language in action.
+
 ## REPL
 
-Use `rlwrap` if you want arrow-key history, line editing, and that sort of thing:
-
-    $ rlwrap smallscheme
+    $ smallscheme
     scheme> (define (fact n) (if (< n 2) n (* n (fact (- n 1)))))
     scheme> (fact 50)
     30414093201713378043612608166064768844377641568960512000000000000
     scheme> ^D
     $
 
-See [tests.scm](https://github.com/eigenhombre/smallscheme/blob/master/tests.scm) for many more examples.
+The REPL comes with arrow-key history, line editing, and other features provided by [the Python Prompt Toolkit](https://python-prompt-toolkit.readthedocs.io/en/stable/).
 
 ## Running Programs
 
