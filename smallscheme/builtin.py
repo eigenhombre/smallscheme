@@ -1,3 +1,4 @@
+import math
 import operator
 import random
 import sys
@@ -34,13 +35,16 @@ def minus(args):
                 args[0][1] - sum(x for (_, x) in args[1:]))
 
 def divide(args):
-    return (argstype(args),
-            args[0][1] // reduce(operator.mul,
-                                 (x for (_, x) in args[1:]),
-                                 1))
+    return ('float',
+            args[0][1] / reduce(operator.mul,
+                                (x for (_, x) in args[1:]),
+                                1))
 
 def equals(args):
-    return bool_(operator.eq(*args))
+    assert len(args) > 0, "= needs at least one argument"
+    if len(args) == 1:
+        return TRUE
+    return bool_(reduce(operator.and_, [arg == args[0] for arg in args[1:]]))
 
 def compare(args, oper):
     ((ty1, v1), (ty2, v2)) = args[:2]
@@ -50,11 +54,20 @@ def compare(args, oper):
                         (ty1, ty2))
     return bool_(oper(v1, v2))
 
+def pairs(coll):
+    return list(zip(coll, coll[1:]))
+
 def lessthan(args):
-    return compare(args, operator.lt)
+    assert len(args) > 0, "= needs at least one argument"
+    if len(args) == 1:
+        return TRUE
+    return bool_(all(value(a) < value(b) for a, b in pairs(args)))
 
 def greaterthan(args):
-    return compare(args, operator.gt)
+    assert len(args) > 0, "= needs at least one argument"
+    if len(args) == 1:
+        return TRUE
+    return bool_(all(value(a) > value(b) for a, b in pairs(args)))
 
 def notnot(args):
     if args[0] == FALSE:
@@ -95,6 +108,28 @@ def randint(arg):
     if t != 'int':
         raise Exception("Invalid arg type, '%s'!" % t)
     return int_(random.randint(0, v - 1))
+
+def mathsin(arg):
+    t, v = arg[0]
+    if t not in ('int', 'float'):
+        raise Exception("Invalid arg type, '%s'!" % t)
+    return float_(math.sin(v))
+
+def mathcos(arg):
+    t, v = arg[0]
+    if t not in ('int', 'float'):
+        raise Exception("Invalid arg type, '%s'!" % t)
+    return float_(math.cos(v))
+
+def mathatan(arg):
+    t, v = arg[0]
+    if t not in ('int', 'float'):
+        raise Exception("Invalid arg type, '%s'!" % t)
+    return float_(math.atan(v))
+
+def displayln(arg):
+    print(printable_value(arg[0]))
+    return noop
 
 def display(arg):
     print(printable_value(arg[0]), end='')
@@ -146,12 +181,16 @@ dispatch_table = {'+': plus,
                   '<': lessthan,
                   '>': greaterthan,
                   'not': notnot,
+                  'sin': mathsin,
+                  'cos': mathcos,
+                  'atan': mathatan,
                   'car': car,
                   'cdr': cdr,
                   'remainder': remainder,
                   'random': randint,
                   'cons': cons,
                   'display': display,
+                  'displayln': displayln,
                   'newline': newline,
                   'runtime': runtime,
                   'is': is_assert,

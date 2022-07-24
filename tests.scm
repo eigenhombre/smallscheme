@@ -1,6 +1,8 @@
 (test
- ;; basic truthy / equality stuff
+ ;; basic truthy / equality / math stuff
  (is #t)
+ (is (= #t #t))
+ (is (= #f #f))
  (is (not #f))
  (is 0)
  (is ())
@@ -10,13 +12,68 @@
  (is (not (= (quote being) (quote nothingness))))
  (is (= 1 1))
  (is (not (= 1 2)))
- (is (= 2 (+ 1 1))))
+ (is (= 2 (+ 1 1)))
+ (is (= 1234 1234))
+ (is (= 2 (+ 1 1)))
+ (is (= 6 (+ 1 2 3)))
+ (is (= 6 (+ 1 2 (+ 1 1 1))))
+ (is (= 1 (* 1 1)))
+ (is (= 120 (* 1 2 3 4 5)))
+ (is (= 3 (- 10 7)))
+ (is (= -10 (- 10)))
+ (is (= 2.0 (/ 10 5)))
+ (is (= 2.0 (/ 16 2 2 2)))
+ (is (= 8 (+ 3 5)))
+ (is (= 8 (* 2 4)))
+ (is (= 16 (+ (* 2 4) (+ 3 5))))
+ (is (= #t (= 1 1)))
+ (is (= #f (= 1 2)))
+ (is (= #f (= 1 (quote notone))))
+ (is (= #t (= #t #t)))
+ (is (= #f (not #t)))
+ (is (= #t (not #f)))
+ (is (= #f (not 1)))
+ (is (= #t (> 2 1)))
+ (is (= #f (> 1 2)))
+ (is (= #f (< 2 1)))
+ (is (= #t (< 1 2)))
+ (is (= #t (cond (#t #t))))
+ (is (= 3 (cond (#t 3))))
+ (is (= #f (cond (#t #f))))
+ (is (= #f (cond (#f #f) (#t #f))))
+ (is (= #t (cond (#f #f) (#t #t))))
+ (is (= #t (cond (#f #f) (else #t))))
+ (is (= 1 (if #t 1 2)))
+ (is (= 2 (if #f 1 2)))
+ (is (= #f (or)))
+ (is (= 1 (or 1)))
+ (is (= 1 (or #f 1)))
+ (is (= 1 (or 1 1)))
+ (is (= #t (and)))
+ (is (= #t (and #t)))
+ (is (= #t (and 1 #t)))
+ (is (= 1 (and #t 1)))
+ (is (= #f (and #t #f)))
+ (is (= #f (and #f #f))))
 
 (test
  ;; basic state / defines
  (define b 4)
  (define a 3)
- (is (= 13 (+ 1 (* a b)))))
+ (is (= 13 (+ 1 (* a b))))
+ ;; P. 8:
+ (define pi 3.14159)
+ (define radius 10)
+ (is (= 314.159 (* pi (* radius radius))))
+ (define circumference (* 2 pi radius))
+ (is (=  62.8318 circumference))
+ ;; P. 19:
+ (define x 7)
+ (is (= #t (and (> x 5) (< x 10))))
+ (is (= 1 (car (quote (1 2 3)))))
+ (is (= (quote a) (car (quote (a b c)))))
+ (is (= (quote (2 3)) (cdr (quote (1 2 3)))))
+ (is (= (quote (b c)) (cdr (quote (a b c))))))
 
 (define (square x)
   (* x x))
@@ -48,7 +105,7 @@
 
 (test
  (define (abs x)
-   (cond ((> x 0) x)
+   (cond ((< 0 x) x)
          ((= x 0) 0)
          ((< x 0) (- x))))
  (is (= 10 (abs 10)))
@@ -66,7 +123,9 @@
          (else x)))
 
  (is (= 10 (abs 10)))
- (is (= 10 (abs -10))))
+ (is (= 10 (abs -10)))
+ (is (= 16 (abs 16)))
+ (is (= 16.0 (abs 16.0))))
 
 (test
  (define (factorial n)
@@ -103,6 +162,23 @@
 )
 
 (test
+ ;; Different arities for comparison fns:
+ (is (= 0))
+ (is (= 0 0))
+ (is (= 0 0 0))
+ (is (= 0 0 0 0))
+ (is (= (quote foo)
+        (quote foo)
+        (quote foo)))
+ (is (not (= 0 0 1)))
+ (is (< 0))  ;; yes, it's a little strange...
+ (is (> 0))
+ (is (< 0 1 2))
+ (is (not (< 0 1 1)))
+ (is (> 2 1 0))
+ (is (not (> 2 1 1))))
+
+(test
  ;; p. 30
  (define (sqrt x)
    (define (good-enough? guess)
@@ -114,7 +190,7 @@
          guess
          (sqrt-iter (improve guess))))
    (sqrt-iter 1.0))
- (is (= 3.0 (sqrt 9))))
+ (is (< 2.999 (sqrt 9) 3.0001)))
 
 (test
  ;; p. 45
@@ -287,3 +363,14 @@
       (let ((x 3)
             (y (+ x 2)))
         (* x y)))))
+
+(test
+ ;; more math
+ (define pi 3.141592653589793)
+ (is (= 0.0 (sin 0)))
+ (is (< (sin pi) 0.000001))
+ (is (= 1.0 (cos 0)))
+ (is (< -0.0001 (cos (/ pi 2)) 0.0001))
+ (is (= -1.0 (cos pi)))
+ (is (= 0.0 (atan 0)))
+ (is (< 1.569 (atan 1000) 1.570)))

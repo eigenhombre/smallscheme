@@ -57,9 +57,10 @@ Example:
 
 # Language
 
-Implemented so far:
+`smallscheme` implements the basics of Scheme required to follow
+examples or work problems in SICP, including the following:
 
-## Functions
+## Primitive Functions
 
     *
     +
@@ -68,15 +69,18 @@ Implemented so far:
     <
     =
     >
+    atan
     car
     cdr
     cons
+    cos
     display
     newline
     not
     random
     remainder
     runtime
+    sin
 
 There are also two simple functions used in the Scheme-language tests: `is` and `test`; `test` currently behaves like a `progn` or `do` in other lisps, in that it collects multiple forms to be evaluated and returns the result of the last evaluation.  `is` is basically `assert`.
 ## Special Forms
@@ -94,6 +98,11 @@ For explanation of these, and of Scheme in general, I recommend
 reading [Structure and Intepretation of Computer
 Programs](https://mitpress.mit.edu/sites/default/files/sicp/index.html),
 in print or (free!) online.
+
+## Caveat
+
+Not a production-ready language implementation -- error messages
+and performance in particular may not be the best.
 
 # Local Development
 
