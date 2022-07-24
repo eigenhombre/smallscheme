@@ -131,26 +131,3 @@ def evalu(expr, env):
     if typeof(expr) == 'list':
         return eval_list(expr, env)
     raise Exception('evaluation error: "%s"' % str(expr))
-
-def inp():
-    if sys.version_info > (2, 9):
-        return input("scheme> ")
-    else:
-        return raw_input("scheme> ")
-
-def repl():
-    env = Env()
-    while True:
-        try:
-            x = inp().strip()
-        except EOFError:
-            print()
-            break
-        if x:
-            try:
-                for parsed in parse_str(x):
-                    pv = printable_value(evalu(parsed, env))
-                    if pv:
-                        print(pv)
-            except Exception as e:
-                print(e)

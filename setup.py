@@ -28,7 +28,8 @@ setup(
         ],
     },
     install_requires=[
-        'lark == 1.1.2'
+        'lark == 1.1.2',
+        'prompt_toolkit == 3.0.30',
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

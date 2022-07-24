@@ -2,7 +2,8 @@
 
 import argparse
 from smallscheme.env import Env
-from smallscheme.scheme import evalu, repl, parse_str
+from smallscheme.scheme import evalu, parse_str
+from smallscheme.repl import repl
 
 def run_file(filename):
     env = Env()

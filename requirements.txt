@@ -1,4 +1,5 @@
 lark == 1.1.2
+prompt_toolkit == 3.0.30
 pycodestyle == 2.5.0
 pytest
 versioneer == 0.22
