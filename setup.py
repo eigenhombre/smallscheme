@@ -14,6 +14,7 @@ setup(
     name="smallscheme",
     author="John Jacobsen",
     author_email="eigenhombre@gmail.com",
+    python_requires=">=3.5",
     description=desc,
     long_description=(desc +
                       ".  See " + homeurl +
