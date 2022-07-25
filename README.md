@@ -99,12 +99,60 @@ reading [Structure and Intepretation of Computer
 Programs](https://mitpress.mit.edu/sites/default/files/sicp/index.html),
 in print or (free!) online.
 
-## Caveat
+# Extending `smallscheme`
+
+`smallscheme` is easily extendable using Python functions.  Anything
+Python can do, your `smallscheme` program can as well.
+
+To add a new function to `smallscheme`, create a function which
+accepts a list of arguments `args`.  These will have to be converted
+into Python objects via the helper functions in `smallscheme.dtypes`.
+For example, to create a function `inc` which increments its argument,
+
+    from smallscheme.dtypes import *
+
+    def inc(args):
+        arg_number = args[0]
+        assert len(args) == 1, "inc only takes one argument"
+        assert typeof(arg_number) in ['int', 'float'], "inc expects a number"
+        num_value = value(arg_number)
+        return int_(num_value + 1)
+
+Then the function should be "registered" so that `smallscheme` knows about it:
+
+    from smallscheme.interop import register_fn
+    register_fn('inc', inc)
+
+Your Python program should then execute Scheme code, either by
+executing one or more Scheme source files, or by launching a REPL:
+
+    import smallscheme
+
+    smallscheme.run_file("myprogram.scm")
+
+    # ... or ...:
+
+    smallscheme.repl()
+
+For a full list of data type operators (for converting from Python to
+Scheme and vice-versa), look at
+[dtypes.py](https://github.com/eigenhombre/smallscheme/blob/master/smallscheme/dtypes.py).
+See also the sample program in the [examples
+folder](https://github.com/eigenhombre/smallscheme/tree/master/examples).
+
+# Caveat
 
 Not a production-ready language implementation -- error messages and
 performance in particular may not be the best.  Features used in later
 parts of SICP may not be available yet. I have been implementing
 them roughly in the order they are introduced.
+
+# Limitations
+
+`smallscheme` uses Python lists to represent Scheme lists.  As such it
+does not support dotted-pair notation or `cons`ing onto a non-list.
+This will require slight changes in a few of the examples in SICP, for example
+on P. 85.
 
 # Local Development
 
