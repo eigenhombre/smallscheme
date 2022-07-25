@@ -10,11 +10,12 @@ A small Scheme written in Python.
 Originally written as a warmup exercise to prepare for [this
 class](https://www.dabeaz.com/sicp.html).
 
-`smallscheme` is not a complete R7RS Scheme (or R5RS for that matter) -- it implements
-everything needed to follow along in
+`smallscheme` is not a complete R7RS Scheme (or R5RS for that matter)
+-- it implements everything needed to follow along in
 [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
-up to page **85**.  `smallscheme` is very lightweight and can be
-installed on any Python 3 installation as follows:
+up to page **102** (however, see "Limitations," below).  `smallscheme`
+is very lightweight and can be installed on any Python 3 installation
+as follows:
 
 # Install
 
@@ -151,8 +152,10 @@ them roughly in the order they are introduced.
 
 `smallscheme` uses Python lists to represent Scheme lists.  As such it
 does not support dotted-pair notation or `cons`ing onto a non-list.
-This will require slight changes in a few of the examples in SICP, for example
-on P. 85.
+This will require slight changes in a few of the examples in SICP.
+The pair representation of rational numbers in Chapter 2, for example,
+would need to be adapted to use lists of two numbers rather than a
+single cons pair.
 
 # Local Development
 
