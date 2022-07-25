@@ -141,12 +141,15 @@ Scheme and vice-versa), look at
 See also the sample program in the [examples
 folder](https://github.com/eigenhombre/smallscheme/tree/master/examples).
 
-# Caveat
+# Caveats
 
 Not a production-ready language implementation -- error messages and
 performance in particular may not be the best.  Features used in later
 parts of SICP may not be available yet. I have been implementing
 them roughly in the order they are introduced.
+
+The status of this work should be considered very alpha.  APIs and
+implementation details may change.
 
 # Limitations
 
