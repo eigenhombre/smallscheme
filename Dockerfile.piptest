@@ -10,3 +10,4 @@ RUN pip install smallscheme
 RUN echo '(+ 1 1)' | smallscheme
 RUN smallscheme fact.scm
 RUN smallscheme -t tests.scm
+RUN python -c "import smallscheme; smallscheme.run_file('fact.scm')"
