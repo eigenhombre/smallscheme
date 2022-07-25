@@ -171,6 +171,13 @@ Scheme tests are run with `./smallscheme/main.py -t tests.scm`.  These
 tests are particularly helpful in seeing what's been implemented so
 far.
 
+# See Also
+
+- [Original blog post](http://johnj.com/posts/scheme-in-python/) introducing `smallscheme`
+- Structure and Interpretation of Computer Programs [Web site](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
+- P. Norvig, [(How to Write a (Lisp) Interpreter (in Python))](http://www.norvig.com/lispy.html)
+- `l1`, [a simple Lisp written in Go](http://johnj.com/posts/l1/) by the author
+
 # License
 
 [MIT](https://github.com/eigenhombre/smallscheme/blob/master/LICENSE.txt)
