@@ -163,6 +163,12 @@ source files, or by launching a REPL for the user:
 
     smallscheme.repl()
 
+... and the new function can then be called from Scheme:
+
+    scheme> (inc 1)
+    ;;=>
+    2
+
 For a full list of data type operators (for converting from Python to
 Scheme and vice-versa), look at
 [dtypes.py](https://github.com/eigenhombre/smallscheme/blob/master/smallscheme/dtypes.py).
