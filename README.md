@@ -111,21 +111,49 @@ into Python objects via the helper functions in `smallscheme.dtypes`.
 For example, to create a function `inc` which increments its argument,
 
     from smallscheme.dtypes import *
+    from smallscheme.interop import scheme_fn
 
+    @scheme_fn
     def inc(args):
-        arg_number = args[0]
         assert len(args) == 1, "inc only takes one argument"
+        arg_number = args[0]
         assert typeof(arg_number) in ['int', 'float'], "inc expects a number"
         num_value = value(arg_number)
         return int_(num_value + 1)
 
-Then the function should be "registered" so that `smallscheme` knows about it:
+The `scheme_fn` decorator handles registration of your Python function
+with the interpreter, which could also be registered explicitly, as follows:
 
     from smallscheme.interop import register_fn
     register_fn('inc', inc)
 
-Your Python program should then execute Scheme code, either by
-executing one or more Scheme source files, or by launching a REPL:
+For function names which are valid in Scheme but not in Python (such
+as `+`), you'll need to use `register_fn` rather than `scheme_fn`.
+
+At the current time, any builtin function (but not special forms) can
+be overridden using this mechanism:
+
+    def strange_plus(args):
+        # addition!
+        if all(typeof(arg) in ['float', 'int']
+               for arg in args):
+            return int_(sum(value(arg) for arg in args))
+        # concatenation!
+        elif all(typeof(arg) == 'list' for arg in args):
+            ret = []
+            for arg in args:
+                ret += value(arg)
+            return list_(ret)
+        # uhhhh... everything else!
+        else:
+            return atom("aStrangerThing")
+
+    # warning!  Change to built-in function:
+    register_fn('+', strange_plus)
+
+Once your Python functions have been registered, your code should then
+execute Scheme expressions, either by executing one or more Scheme
+source files, or by launching a REPL for the user:
 
     import smallscheme
 
