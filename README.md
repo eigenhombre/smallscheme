@@ -131,27 +131,11 @@ For function names which are valid in Scheme but not in Python (such
 as `+`), you'll need to use `register_fn` rather than `scheme_fn`.
 
 At the current time, any builtin function (but not special forms) can
-be overridden using this mechanism:
+be overridden using this mechanism.  There's [an example of
+this](https://github.com/eigenhombre/smallscheme/blob/master/smallscheme/test_interop.py#L22)
+in the tests.
 
-    def strange_plus(args):
-        # addition!
-        if all(typeof(arg) in ['float', 'int']
-               for arg in args):
-            return int_(sum(value(arg) for arg in args))
-        # concatenation!
-        elif all(typeof(arg) == 'list' for arg in args):
-            ret = []
-            for arg in args:
-                ret += value(arg)
-            return list_(ret)
-        # uhhhh... everything else!
-        else:
-            return atom("aStrangerThing")
-
-    # warning!  Change to built-in function:
-    register_fn('+', strange_plus)
-
-Once your Python functions have been registered, your code should then
+Once your Python functions have been registered, your code can then
 execute Scheme expressions, either by executing one or more Scheme
 source files, or by launching a REPL for the user:
 
