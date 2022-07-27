@@ -102,8 +102,7 @@ in print or (free!) online.
 
 # Extending `smallscheme`
 
-`smallscheme` is easily extendable using Python functions.  Anything
-Python can do, your `smallscheme` program can as well.
+`smallscheme` is easily extendable using Python functions.
 
 To add a new function to `smallscheme`, create a function which
 accepts a list of arguments `args`.  These will have to be converted
