@@ -1,10 +1,7 @@
-name: run github actions with tox
+name: Run tox, Multiple Python Versions
 
 on:
   push:
-    branches:
-      - master
-      - f_add_tox_testing
   pull_request:
 
 jobs:
@@ -13,7 +10,6 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
-
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -26,4 +22,3 @@ jobs:
         python -m pip install tox tox-gh-actions
     - name: Test with tox
       run: tox
-
