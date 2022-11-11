@@ -14,8 +14,8 @@ class](https://www.dabeaz.com/sicp.html).
 -- it implements everything needed to follow along in
 [SICP](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
 up to page **102** (however, see "Limitations," below).  `smallscheme`
-is very lightweight and can be installed on any Python 3 installation
-as follows:
+is very lightweight, is [extendable](#extending-smallscheme), and can
+be installed on any Python 3 installation as follows:
 
 # Install
 
