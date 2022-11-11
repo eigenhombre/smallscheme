@@ -3,7 +3,7 @@ smallscheme
 
 <img src="/smallscheme.jpg" width="300">
 
-![build](https://github.com/eigenhombre/smallscheme/actions/workflows/test.yml/badge.svg)
+![build](https://github.com/eigenhombre/smallscheme/actions/workflows/build.yml/badge.svg)
 
 A small Scheme written in Python.
 
